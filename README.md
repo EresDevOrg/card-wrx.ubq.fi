@@ -1,4 +1,4 @@
-# `@ubiquity/ts-template`
+# `card.ubq.fi`
 
 This template repository includes support for the following:
 
