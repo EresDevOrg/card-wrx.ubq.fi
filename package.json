@@ -35,7 +35,8 @@
     "@reown/appkit-adapter-ethers5": "^1.7.0",
     "@ubiquity-dao/rpc-handler": "^1.4.0",
     "dotenv": "^16.4.7",
-    "ethers": "5.7.2"
+    "ethers": "5.7.2",
+    "wrangler": "^4.0.0"
   },
   "devDependencies": {
     "@actions/core": "^1.11.1",
