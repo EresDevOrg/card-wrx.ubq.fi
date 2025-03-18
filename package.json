@@ -11,6 +11,7 @@
   },
   "scripts": {
     "start": "bun build/esbuild-server.ts",
+    "wrangler": "wrangler pages dev static --port 8080",
     "build": "bun build/esbuild-build.ts",
     "format": "run-s format:lint format:prettier format:cspell",
     "format:lint": "eslint --fix .",
