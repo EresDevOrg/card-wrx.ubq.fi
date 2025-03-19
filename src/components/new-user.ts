@@ -1,3 +1,6 @@
+import { appState } from "../main";
+import { wirexPayChainTestnet } from "../shared/wirex-pay-chain";
+
 export function newUser(): string {
   return `
     <div class="demo-card">
@@ -37,6 +40,21 @@ export function newUser(): string {
 
 export function handleNewUserEvents() {
   document.getElementById("register")?.addEventListener("click", () => {
+    // const onChainRegisterABI = {
+    //   type: "function",
+    //   name: "createAccount",
+    //   constant: false,
+    //   payable: false,
+    //   inputs: [],
+    //   outputs: [],
+    // };
+
+    // const wirexRegisterContractTestnet = "0x3fe04562Fc28b4152F24A41E8A8c3899E6B8c433";
+    // const wirexRegisterContractMainnet = "0x2766F66E572C94a4cbc57f4d5bd2aD71900edF30";
+
+    appState.switchNetwork(wirexPayChainTestnet).catch((error) => {
+      console.error("Error switching network", error);
+    });
     alert("Registering new user");
   });
 }
