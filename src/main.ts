@@ -7,6 +7,7 @@ import { ethers } from "ethers";
 import { handleRouting } from "./router";
 import { providersUrl } from "./constants";
 import { useRpcHandler } from "./shared/use-rpc-handler";
+import { wirexPayChain, wirexPayChainTestnet } from "./shared/wirex-pay-chain";
 
 const projectId = "415760038f8e330de4868120be3205b8";
 
@@ -21,9 +22,9 @@ let networks: [AppKitNetwork, ...AppKitNetwork[]];
 
 if (window.location.hostname === "localhost" || window.location.hostname === "0.0.0.0") {
   console.log("enabling anvil");
-  networks = [anvil, mainnet];
+  networks = [anvil, mainnet, wirexPayChainTestnet, wirexPayChain];
 } else {
-  networks = [mainnet];
+  networks = [mainnet, wirexPayChainTestnet, wirexPayChain];
 }
 
 export const appState = createAppKit({
