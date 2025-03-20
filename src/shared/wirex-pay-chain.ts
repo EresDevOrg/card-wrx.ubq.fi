@@ -12,12 +12,12 @@ export const wirexPayChainTestnet = defineChain({
   },
   rpcUrls: {
     default: {
-      http: ["https://wirex-devnet-rpc.eu-north-2.gateway.fm/"],
+      http: ["https://wirex-devnet-rpc.eu-north-2.gateway.fm"],
       webSocket: [],
     },
   },
   blockExplorers: {
-    default: { name: "Explorer", url: "https://wirex-devnet-blockscout.eu-north-2.gateway.fm/" },
+    default: { name: "Explorer", url: "https://wirex-devnet-blockscout.eu-north-2.gateway.fm" },
   },
   contracts: {
     // Add the contracts here
@@ -36,12 +36,12 @@ export const wirexPayChain = defineChain({
   },
   rpcUrls: {
     default: {
-      http: ["https://rpc.wirexpaychain.com/"],
+      http: ["https://rpc.wirexpaychain.com"],
       webSocket: [],
     },
   },
   blockExplorers: {
-    default: { name: "Explorer", url: "https://blockscout.wirexpaychain.com/" },
+    default: { name: "Explorer", url: "https://blockscout.wirexpaychain.com" },
   },
   contracts: {
     // Add the contracts here

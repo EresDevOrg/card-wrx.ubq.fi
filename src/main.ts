@@ -22,7 +22,7 @@ let networks: [AppKitNetwork, ...AppKitNetwork[]];
 
 if (window.location.hostname === "localhost" || window.location.hostname === "0.0.0.0") {
   console.log("enabling anvil");
-  networks = [anvil, mainnet, wirexPayChainTestnet, wirexPayChain];
+  networks = [mainnet, wirexPayChainTestnet, wirexPayChain, anvil];
 } else {
   networks = [mainnet, wirexPayChainTestnet, wirexPayChain];
 }
@@ -45,7 +45,7 @@ export let provider: ethers.providers.JsonRpcProvider | undefined;
 export let userSigner: ethers.Signer | undefined;
 let web3Provider: ethers.providers.Web3Provider | undefined;
 
-async function initializeProviderAndSigner() {
+export async function initializeProviderAndSigner() {
   const networkId = Number(appState.getChainId());
   if (networkId && providersUrl[networkId]) {
     // read-only provider for fetching
@@ -74,7 +74,7 @@ async function initializeProviderAndSigner() {
   }
 }
 
-function handleNetworkSwitch() {
+export function handleNetworkSwitch() {
   // network change listener
   appState.subscribeCaipNetworkChange((newState?: { id: string | number; name: string }) => {
     if (newState) {

@@ -1,5 +1,6 @@
-import { appState } from "../main";
-import { wirexPayChainTestnet } from "../shared/wirex-pay-chain";
+import { ethers } from "ethers";
+import { appState, handleNetworkSwitch } from "../main";
+import { wirexPayChain, wirexPayChainTestnet } from "../shared/wirex-pay-chain";
 
 export function newUser(): string {
   return `
@@ -40,21 +41,53 @@ export function newUser(): string {
 
 export function handleNewUserEvents() {
   document.getElementById("register")?.addEventListener("click", () => {
-    // const onChainRegisterABI = {
-    //   type: "function",
-    //   name: "createAccount",
-    //   constant: false,
-    //   payable: false,
-    //   inputs: [],
-    //   outputs: [],
-    // };
+    (async () => {
+      const backendBaseUrl = "";
+      const authUrl = `${backendBaseUrl}/auth`;
+      const authResponse = await fetch(authUrl, { method: "GET" });
 
-    // const wirexRegisterContractTestnet = "0x3fe04562Fc28b4152F24A41E8A8c3899E6B8c433";
-    // const wirexRegisterContractMainnet = "0x2766F66E572C94a4cbc57f4d5bd2aD71900edF30";
+      const responseJson = await authResponse.json();
 
-    appState.switchNetwork(wirexPayChainTestnet).catch((error) => {
-      console.error("Error switching network", error);
-    });
-    alert("Registering new user");
+      const isSandbox = responseJson.isSandbox;
+
+      if (authResponse.status != 200) {
+        alert(`"Error authenticating: ${responseJson}`);
+        console.error("Error authenticating: ", responseJson);
+        return;
+      }
+
+      const wirexContractAbi = [
+        {
+          type: "function",
+          name: "createAccount",
+          constant: false,
+          payable: false,
+          inputs: [],
+          outputs: [],
+        },
+      ];
+
+      await appState.switchNetwork(isSandbox ? wirexPayChainTestnet : wirexPayChain).catch((error) => {
+        // change it to try/catch
+        console.error("Error switching network", error);
+        alert(`"Error switching network: ${error}`);
+      });
+
+      handleNetworkSwitch();
+
+      let wirexRegisterContract = "0x2766F66E572C94a4cbc57f4d5bd2aD71900edF30";
+      if (responseJson.isSandbox) {
+        wirexRegisterContract = "0x3fe04562Fc28b4152F24A41E8A8c3899E6B8c433";
+      }
+
+      //const provider = appState.getProvider("eip155");
+
+      const wirexContract = new ethers.Contract(wirexRegisterContract, wirexContractAbi);
+      const tx = await wirexContract.createAccount();
+
+      console.log("tx", tx);
+
+      alert("Registered new user");
+    })().catch(console.error);
   });
 }
