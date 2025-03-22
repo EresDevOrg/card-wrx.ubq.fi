@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { appState, handleNetworkSwitch } from "../main";
+import { appState } from "../main";
 import { wirexPayChain, wirexPayChainTestnet } from "../shared/wirex-pay-chain";
 
 export function newUser(): string {
@@ -45,17 +45,13 @@ export function handleNewUserEvents() {
       const backendBaseUrl = "";
       const authUrl = `${backendBaseUrl}/auth`;
       const authResponse = await fetch(authUrl, { method: "GET" });
-
       const responseJson = await authResponse.json();
-
       const isSandbox = responseJson.isSandbox;
-
       if (authResponse.status != 200) {
         alert(`"Error authenticating: ${responseJson}`);
         console.error("Error authenticating: ", responseJson);
         return;
       }
-
       const wirexContractAbi = [
         {
           type: "function",
@@ -66,28 +62,23 @@ export function handleNewUserEvents() {
           outputs: [],
         },
       ];
-
-      await appState.switchNetwork(isSandbox ? wirexPayChainTestnet : wirexPayChain).catch((error) => {
-        // change it to try/catch
-        console.error("Error switching network", error);
-        alert(`"Error switching network: ${error}`);
-      });
-
-      handleNetworkSwitch();
-
+      await appState.switchNetwork(isSandbox ? wirexPayChainTestnet : wirexPayChain);
+      //handleNetworkSwitch();
       let wirexRegisterContract = "0x2766F66E572C94a4cbc57f4d5bd2aD71900edF30";
       if (responseJson.isSandbox) {
         wirexRegisterContract = "0x3fe04562Fc28b4152F24A41E8A8c3899E6B8c433";
       }
-
       //const provider = appState.getProvider("eip155");
 
-      const wirexContract = new ethers.Contract(wirexRegisterContract, wirexContractAbi);
-      const tx = await wirexContract.createAccount();
+      if (window.ethereum) {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
 
-      console.log("tx", tx);
-
-      alert("Registered new user");
+        const wirexContract = new ethers.Contract(wirexRegisterContract, wirexContractAbi, signer);
+        const tx = await wirexContract.createAccount();
+        console.log("tx", tx);
+        alert("Registered new user");
+      }
     })().catch(console.error);
   });
 }
