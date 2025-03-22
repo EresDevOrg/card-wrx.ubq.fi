@@ -45,7 +45,13 @@ export async function useRpcHandler(networkId: number) {
     }
     return provider;
   } catch (e) {
-    console.log(`RpcHandler is having issues. Error: ${e} \nUsing backup rpc.`);
-    return new JsonRpcProvider({ url: providersUrl[networkId], skipFetchSetup: true });
+    console.log(`RpcHandler is having issues. Error: ${e} \nUsing backup rpc. ${networkId}`);
+    const provider = new JsonRpcProvider({ url: providersUrl[networkId] }, Number(networkId));
+
+    const network = await provider.getNetwork();
+    if (network.chainId) {
+      return provider;
+    }
+    throw new Error(`RpcHandler and fallback Rpc Provider, both failed. Refresh the page.`);
   }
 }
