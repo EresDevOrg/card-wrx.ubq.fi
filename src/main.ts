@@ -22,15 +22,15 @@ let networks: [AppKitNetwork, ...AppKitNetwork[]];
 
 if (window.location.hostname === "localhost" || window.location.hostname === "0.0.0.0") {
   console.log("enabling anvil");
-  networks = [mainnet, wirexPayChainTestnet, wirexPayChain, anvil];
+  networks = [wirexPayChainTestnet, mainnet, wirexPayChain, anvil];
 } else {
-  networks = [mainnet, wirexPayChainTestnet, wirexPayChain];
+  networks = [wirexPayChainTestnet, mainnet, wirexPayChain];
 }
 
 export const appState = createAppKit({
   adapters: [new Ethers5Adapter()],
   networks: networks,
-  defaultNetwork: mainnet,
+  defaultNetwork: wirexPayChainTestnet,
   metadata,
   projectId,
   features: {
@@ -56,6 +56,7 @@ export async function initializeProviderAndSigner() {
   }
 
   // if user is connected, set up the signer using the injected provider (window.ethereum)
+  console.log("main appState.getIsConnectedState()", appState.getIsConnectedState());
   if (appState.getIsConnectedState() && window.ethereum) {
     const ethereum = window.ethereum as ethers.providers.ExternalProvider;
     if (ethereum.request) {
