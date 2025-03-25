@@ -8,11 +8,12 @@ export async function onRequest(ctx): Promise<Response> {
     // if (!result.success) {
     //   throw new Error(`Invalid post parameters: ${JSON.stringify(result)}`);
     // }
-
+    console.log("result", result);
     const { wallet_address: wallet, email, country } = result;
 
     // API endpoint from WirexPayChain partner documentation
-    const apiBaseUrl = ctx.env.isSandbox ? "https://api-business.wirexpaychain.tech" : "https://api.wirexpaychain.com";
+    console.log("Is sandbox: ", accessToken.isSandbox);
+    const apiBaseUrl = accessToken.isSandbox ? "https://api-business.wirexpaychain.tech" : "https://api.wirexpaychain.com";
 
     console.log("Sending request to", `${apiBaseUrl}/api/v1/user`);
 
