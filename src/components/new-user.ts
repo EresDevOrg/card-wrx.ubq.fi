@@ -2,6 +2,7 @@ import { ethers } from "ethers";
 import { appState } from "../main";
 import { wirexPayChain, wirexPayChainTestnet } from "../shared/wirex-pay-chain";
 import { AccessToken } from "../../functions/shared";
+import { showToast } from "./toaster";
 
 // Step states
 enum RegistrationStep {
@@ -66,9 +67,12 @@ export function newUser(): string {
   `;
 }
 
+const totalRegistrationSteps = 2;
+
 export function handleNewUserEvents() {
   // Step 1: On-chain registration
   document.getElementById("register")?.addEventListener("click", (event) => {
+    showToast({ message: `Step 1/${totalRegistrationSteps}: Register on chain.` });
     const button = event.currentTarget as HTMLAnchorElement;
     button.style.pointerEvents = "none"; // Disable further clicks
     (async () => {
@@ -84,6 +88,7 @@ export function handleNewUserEvents() {
   // Step 2: API registration with email
   document.getElementById("email-registration-form")?.addEventListener("submit", (event) => {
     event.preventDefault();
+    showToast({ message: `Step 2/${totalRegistrationSteps}: Register on wirex.` });
     registerOnApp().catch(console.error);
   });
 }
