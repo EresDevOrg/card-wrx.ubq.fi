@@ -55,3 +55,73 @@ a:active {
   color: #fff;
   text-decoration: underline;
 }
+/* toaster.css */
+.toaster-container {
+  position: fixed;
+  bottom: 20px; /* Near bottom */
+  left: 50%; /* Center horizontally */
+  transform: translateX(-50%); /* Offset to truly center */
+  z-index: 9999;
+  font-family: "Proxima Nova", "Ubiquity Nova", sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  pointer-events: none; /* Allows clicks to pass through container */
+}
+
+.toast {
+  background-color: #1a1a2e; /* Slightly lighter than body #06061aff for contrast */
+  color: #ffffff;
+  padding: 12px 20px;
+  border-radius: 4px;
+  margin-top: 10px; /* Stack upwards instead of downwards */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 250px;
+  max-width: 400px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* Slightly stronger shadow for depth */
+  opacity: 0;
+  transform: translateY(20px); /* Start below and slide up */
+  transition: all 0.3s ease;
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABYWlDQ1BrQ0dDb2xvclNwYWNlRGlzcGxheVAzAAAokWNgYFJJLCjIYWFgYMjNKykKcndSiIiMUmB/yMAOhLwMYgwKicnFBY4BAT5AJQwwGhV8u8bACKIv64LMOiU1tUm1XsDXYqbw1YuvRJsw1aMArpTU4mQg/QeIU5MLikoYGBhTgGzl8pICELsDyBYpAjoKyJ4DYqdD2BtA7CQI+whYTUiQM5B9A8hWSM5IBJrB+API1klCEk9HYkPtBQFul8zigpzESoUAYwKuJQOUpFaUgGjn/ILKosz0jBIFR2AopSp45iXr6SgYGRiaMzCAwhyi+nMgOCwZxc4gxJrvMzDY7v////9uhJjXfgaGjUCdXDsRYhoWDAyC3AwMJ3YWJBYlgoWYgZgpLY2B4dNyBgbeSAYG4QtAPdHFacZGYHlGHicGBtZ7//9/VmNgYJ/MwPB3wv//vxf9//93MVDzHQaGA3kAFSFl7jXH0fsAAAA4ZVhJZk1NACoAAAAIAAGHaQAEAAAAAQAAABoAAAAAAAKgAgAEAAAAAQAAABigAwAEAAAAAQAAABgAAAAAwf1XlwAAACNJREFUSA3t0IEAAAAMBKFHm7/UTaQQWnXDgAEDBgwYMGDgAXaJAz4RVVHYAAAAAElFTkSuQmCC");
+  pointer-events: auto; /* Allows interaction with toast itself */
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateY(0); /* Slide up to position */
+}
+
+.toast-success {
+  border-bottom: 4px solid #66bb6a; /* Lighter green for bottom border */
+}
+
+.toast-error {
+  border-bottom: 4px solid #ef5350; /* Lighter red for bottom border */
+}
+
+.toast-info {
+  border-bottom: 4px solid #42a5f5; /* Lighter blue for bottom border */
+}
+
+.toast-message {
+  flex: 1;
+  margin-right: 10px;
+}
+
+.toast-close {
+  background: none;
+  border: none;
+  color: #e0e0e0; /* Slightly off-white for better contrast */
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0 5px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.toast-close:hover {
+  opacity: 1;
+}
