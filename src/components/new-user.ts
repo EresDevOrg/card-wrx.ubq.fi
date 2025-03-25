@@ -66,6 +66,79 @@ export function newUser(): string {
   `;
 }
 
+export function handleNewUserEvents() {
+  // Step 1: On-chain registration
+  document.getElementById("register")?.addEventListener("click", () => {
+    registerOnChain().catch(console.error);
+  });
+
+  // Step 2: API registration with email
+  document.getElementById("email-registration-form")?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    registerOnApp().catch(console.error);
+  });
+}
+
+async function registerOnChain() {
+  const authData = await authenticateUser();
+  if (!authData) return;
+
+  const wirexRegisterContract = await setupNetworkAndContract(authData);
+
+  if (!window.ethereum) {
+    alert("Please install a Web3 wallet like MetaMask to continue.");
+    return;
+  }
+
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  const isRegistered = await checkUserRegistration(provider, wirexRegisterContract);
+
+  if (isRegistered) {
+    console.log("User already registered on-chain, proceeding to step 2");
+    updateRegistrationUi();
+  } else {
+    await registerNewUser(provider, wirexRegisterContract);
+  }
+}
+
+async function registerOnApp() {
+  if (currentStep !== RegistrationStep.ON_CHAIN_REGISTERED) {
+    alert("Please complete step 1 first.");
+    return;
+  }
+
+  const emailInput = document.getElementById("email") as HTMLInputElement;
+  const email = emailInput.value.trim();
+
+  if (!email) {
+    alert("Please enter a valid email address.");
+    return;
+  }
+
+  // Get user's wallet address
+  if (window.ethereum) {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+    const userAddress = await signer.getAddress();
+
+    // Get sandbox status
+    const backendBaseUrl = "";
+    const authUrl = `${backendBaseUrl}/auth`;
+    await fetch(authUrl, { method: "GET" });
+
+    // Register user with API
+    const isSuccess = await registerUserWithApi(email, userAddress);
+
+    if (isSuccess) {
+      currentStep = RegistrationStep.API_REGISTERED;
+      alert("Registration complete! Your UbiquiCard will be available soon.");
+      // Here you could redirect to a success page or show a success message
+    }
+  } else {
+    alert("Please install a Web3 wallet like MetaMask to continue.");
+  }
+}
+
 // Check if user is already registered on-chain
 async function checkUserRegistration(provider: ethers.providers.Web3Provider, contractAddress: string): Promise<boolean> {
   try {
@@ -113,6 +186,7 @@ async function checkUserRegistration(provider: ethers.providers.Web3Provider, co
     // AccountStatus enum: 0 = NOT_CREATED, 1 = CREATED, 2 = SUSPENDED
     // We consider the account registered if status is CREATED (1) or SUSPENDED (2)
     const accountStatus = accountInfo.status;
+    console.log(`Account status: ${accountStatus}`);
     return accountStatus > 0; // If status > 0, account exists
   } catch (error) {
     console.error("Error checking registration:", error);
@@ -151,57 +225,6 @@ async function registerUserWithApi(email: string, userAddress: string): Promise<
     console.error("Error registering with API:", error);
     alert(`Error registering with API: ${error instanceof Error ? error.message : String(error)}`);
     return false;
-  }
-}
-
-export function handleNewUserEvents() {
-  // Step 1: On-chain registration
-  document.getElementById("register")?.addEventListener("click", () => {
-    registerOnChain().catch(console.error);
-  });
-
-  // Step 2: API registration with email
-  document.getElementById("email-registration-form")?.addEventListener("submit", (event) => {
-    event.preventDefault();
-    registerOnApp().catch(console.error);
-  });
-}
-
-async function registerOnApp() {
-  if (currentStep !== RegistrationStep.ON_CHAIN_REGISTERED) {
-    alert("Please complete step 1 first.");
-    return;
-  }
-
-  const emailInput = document.getElementById("email") as HTMLInputElement;
-  const email = emailInput.value.trim();
-
-  if (!email) {
-    alert("Please enter a valid email address.");
-    return;
-  }
-
-  // Get user's wallet address
-  if (window.ethereum) {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
-    const userAddress = await signer.getAddress();
-
-    // Get sandbox status
-    const backendBaseUrl = "";
-    const authUrl = `${backendBaseUrl}/auth`;
-    await fetch(authUrl, { method: "GET" });
-
-    // Register user with API
-    const isSuccess = await registerUserWithApi(email, userAddress);
-
-    if (isSuccess) {
-      currentStep = RegistrationStep.API_REGISTERED;
-      alert("Registration complete! Your UbiquiCard will be available soon.");
-      // Here you could redirect to a success page or show a success message
-    }
-  } else {
-    alert("Please install a Web3 wallet like MetaMask to continue.");
   }
 }
 
@@ -252,26 +275,4 @@ async function registerNewUser(provider: ethers.providers.JsonRpcProvider, contr
 
   alert("Successfully registered on-chain! Please complete step 2.");
   updateRegistrationUi();
-}
-
-async function registerOnChain() {
-  const authData = await authenticateUser();
-  if (!authData) return;
-
-  const wirexRegisterContract = await setupNetworkAndContract(authData);
-
-  if (!window.ethereum) {
-    alert("Please install a Web3 wallet like MetaMask to continue.");
-    return;
-  }
-
-  const provider = new ethers.providers.Web3Provider(window.ethereum);
-  const isRegistered = await checkUserRegistration(provider, wirexRegisterContract);
-
-  if (isRegistered) {
-    console.log("User already registered on-chain, proceeding to step 2");
-    updateRegistrationUi();
-  } else {
-    await registerNewUser(provider, wirexRegisterContract);
-  }
 }
