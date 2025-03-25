@@ -5,13 +5,16 @@ export async function onRequest(ctx): Promise<Response> {
     validateRequestMethod(ctx.request.method, "POST");
     const accessToken = await getAccessToken(ctx.env);
     const result = await ctx.request.json();
-    if (!result.success) {
-      throw new Error(`Invalid post parameters: ${JSON.stringify(result)}`);
-    }
-    const { wallet, email, country } = result.data;
+    // if (!result.success) {
+    //   throw new Error(`Invalid post parameters: ${JSON.stringify(result)}`);
+    // }
+
+    const { wallet_address: wallet, email, country } = result;
 
     // API endpoint from WirexPayChain partner documentation
     const apiBaseUrl = ctx.env.isSandbox ? "https://api-business.wirexpaychain.tech" : "https://api.wirexpaychain.com";
+
+    console.log("Sending request to", `${apiBaseUrl}/api/v1/user`);
 
     const response = await fetch(`${apiBaseUrl}/api/v1/user`, {
       method: "POST",
