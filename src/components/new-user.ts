@@ -68,8 +68,17 @@ export function newUser(): string {
 
 export function handleNewUserEvents() {
   // Step 1: On-chain registration
-  document.getElementById("register")?.addEventListener("click", () => {
-    registerOnChain().catch(console.error);
+  document.getElementById("register")?.addEventListener("click", (event) => {
+    const button = event.currentTarget as HTMLAnchorElement;
+    button.style.pointerEvents = "none"; // Disable further clicks
+    (async () => {
+      try {
+        await registerOnChain(button);
+      } catch (error) {
+        console.error(error);
+      }
+      button.style.pointerEvents = "auto"; // Re-enable clicks
+    })().catch(console.error);
   });
 
   // Step 2: API registration with email
@@ -79,25 +88,29 @@ export function handleNewUserEvents() {
   });
 }
 
-async function registerOnChain() {
-  const authData = await authenticateUser();
-  if (!authData) return;
+async function registerOnChain(button: HTMLAnchorElement) {
+  try {
+    const authData = await authenticateUser();
+    if (!authData) return;
 
-  const wirexRegisterContract = await setupNetworkAndContract(authData);
+    const wirexRegisterContract = await setupNetworkAndContract(authData);
 
-  if (!window.ethereum) {
-    alert("Please install a Web3 wallet like MetaMask to continue.");
-    return;
-  }
+    if (!window.ethereum) {
+      alert("Please install a Web3 wallet like MetaMask to continue.");
+      return;
+    }
 
-  const provider = new ethers.providers.Web3Provider(window.ethereum);
-  const isRegistered = await checkUserRegistration(provider, wirexRegisterContract);
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const isRegistered = await checkUserRegistration(provider, wirexRegisterContract);
 
-  if (isRegistered) {
-    console.log("User already registered on-chain, proceeding to step 2");
-    updateRegistrationUi();
-  } else {
-    await registerNewUser(provider, wirexRegisterContract);
+    if (isRegistered) {
+      console.log("User already registered on-chain, proceeding to step 2");
+      updateRegistrationUi();
+    } else {
+      await registerNewUser(provider, wirexRegisterContract);
+    }
+  } finally {
+    button.style.pointerEvents = "auto"; // Re-enable clicks
   }
 }
 
