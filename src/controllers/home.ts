@@ -1,5 +1,6 @@
 import { createHomePage } from "../components/home";
-import { handleNewUserEvents, newUser } from "../components/new-user";
+import { handleRegisterEvents, register } from "../components/register/main";
+
 import { appState } from "../main";
 
 export async function loadHomePage() {
@@ -8,9 +9,9 @@ export async function loadHomePage() {
   if (contentArea) {
     try {
       if (appState.getIsConnectedState()) {
-        const content = newUser();
+        const content = register();
         contentArea.innerHTML = content;
-        handleNewUserEvents();
+        handleRegisterEvents();
       } else {
         const content = createHomePage();
         contentArea.innerHTML = content;

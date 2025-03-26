@@ -1,6 +1,6 @@
-import { registerOnApp } from "./register/on-app-register";
-import { registerOnChain } from "./register/on-chain-register";
-import { showToast } from "./toaster";
+import { showToast } from "../toaster";
+import { registerOnApp } from "./on-app-register";
+import { registerOnChain } from "./on-chain-register";
 
 // Step states
 export enum RegistrationStep {
@@ -13,7 +13,7 @@ const totalRegistrationSteps = 2;
 
 let currentStep = RegistrationStep.INITIAL;
 
-export function newUser(): string {
+export function register(): string {
   return `
     <div class="demo-card">
       <div id="step-1">
@@ -65,7 +65,7 @@ export function newUser(): string {
   `;
 }
 
-export function handleNewUserEvents() {
+export function handleRegisterEvents() {
   // Step 1: On-chain registration
   document.getElementById("register")?.addEventListener("click", (event) => {
     showToast({ message: `Step 1/${totalRegistrationSteps}: Register on chain.` });
