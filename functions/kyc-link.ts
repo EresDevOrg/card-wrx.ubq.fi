@@ -1,3 +1,4 @@
+import { validateRequestMethod } from "./register";
 import { getAccessToken } from "./shared";
 
 export async function onRequest(ctx): Promise<Response> {
@@ -38,18 +39,5 @@ export async function onRequest(ctx): Promise<Response> {
   } catch (error) {
     console.error("Error registering with API:", error);
     return Response.json({ message: "Registering user failed" }, { status: 500 });
-  }
-}
-
-export function validateRequestMethod(expectedMethod: string, receivedMethod: string) {
-  if (receivedMethod !== expectedMethod) {
-    console.error(
-      "Invalid request method.",
-      JSON.stringify({
-        expectedMethod,
-        receivedMethod,
-      })
-    );
-    throw new Error("Invalid request method.");
   }
 }
