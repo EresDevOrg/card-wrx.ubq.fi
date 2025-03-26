@@ -11,3 +11,5 @@ export const explorersUrl: { [key: string]: string } = {
   31415: "https://blockscout.wirexpaychain.com",
   230378335: "https://wirex-devnet-blockscout.eu-north-2.gateway.fm",
 };
+
+export const backendBaseUrl = "";
