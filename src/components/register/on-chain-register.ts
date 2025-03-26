@@ -3,24 +3,26 @@ import { AccessToken } from "../../../functions/shared";
 import { backendBaseUrl } from "../../constants";
 import { appState } from "../../main";
 import { wirexPayChain, wirexPayChainTestnet } from "../../shared/wirex-pay-chain";
+import { showToast } from "../toaster";
 
 export async function registerOnChain(button: HTMLAnchorElement) {
   try {
     const authData = await authenticateUser();
-    if (!authData) return;
+    if (!authData) throw new Error("Error authenticating.");
 
     const wirexRegisterContract = await setupNetworkAndContract(authData);
 
     if (!window.ethereum) {
       alert("Please install a Web3 wallet like MetaMask to continue.");
-      return;
+      return false;
     }
 
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const isRegistered = await checkUserRegistration(provider, wirexRegisterContract);
 
     if (isRegistered) {
-      console.log("User already registered on-chain, proceeding to step 2");
+      showToast({ message: "User already registered on-chain. Proceeding to next step." });
+      return true;
     } else {
       await registerNewUser(provider, wirexRegisterContract);
     }
@@ -35,7 +37,7 @@ async function authenticateUser() {
   const responseJson = await authResponse.json();
 
   if (authResponse.status !== 200) {
-    alert(`Error authenticating: ${responseJson}`);
+    showToast({ message: "Error authenticating.", type: "error" });
     console.error("Error authenticating: ", responseJson);
     return null;
   }
@@ -64,9 +66,14 @@ async function registerNewUser(provider: ethers.providers.JsonRpcProvider, contr
 
   const wirexContract = new ethers.Contract(contractAddress, wirexContractAbi, signer);
   const tx = await wirexContract.createAccount();
-  await tx.wait();
-
-  alert("Successfully registered on-chain! Please complete step 2.");
+  const receipt = await tx.wait();
+  if (receipt.status === 1) {
+    showToast({ message: "Successfully registered on-chain! Please complete step 2." });
+    return true;
+  } else {
+    showToast({ message: "Error registering on chain. Check on block explorer." });
+    return false;
+  }
 }
 
 async function checkUserRegistration(provider: ethers.providers.Web3Provider, contractAddress: string): Promise<boolean> {
@@ -112,8 +119,19 @@ async function checkUserRegistration(provider: ethers.providers.Web3Provider, co
     const contract = new ethers.Contract(contractAddress, checkRegistrationAbi, provider);
     const accountInfo = await contract.getAccount(userAddress);
 
-    // AccountStatus enum: 0 = NOT_CREATED, 1 = CREATED, 2 = SUSPENDED
-    // We consider the account registered if status is CREATED (1) or SUSPENDED (2)
+    // AccountStatus is a enum for account status
+    // - Pending status means that account has been created but not activated and cannot be used
+    // - Active status means that account has been activated and can be used
+    // - Blocked status means that account has been blocked and cannot be used
+    // - Deleted status means that account has been deleted and cannot be used
+    // Account status can be changed by the KYC oracle
+    //   enum AccountStatus {
+    //     UNKNOWN,
+    //     PENDING,
+    //     ACTIVE,
+    //     BLOCKED,
+    //     DELETED
+    // }
     const accountStatus = accountInfo.status;
     console.log(`Account status: ${accountStatus}`);
     return accountStatus > 0; // If status > 0, account exists
