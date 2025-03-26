@@ -1,5 +1,4 @@
-import { ethers } from "ethers";
-import { backendBaseUrl } from "../constants";
+import { registerOnApp } from "./register/on-app-register";
 import { registerOnChain } from "./register/on-chain-register";
 import { showToast } from "./toaster";
 
@@ -75,10 +74,11 @@ export function handleNewUserEvents() {
     (async () => {
       try {
         await registerOnChain(button);
+        updateStep1Ui();
       } catch (error) {
         console.error(error);
       }
-      updateRegistrationUi();
+
       button.style.pointerEvents = "auto"; // Re-enable clicks
     })().catch(console.error);
   });
@@ -86,84 +86,37 @@ export function handleNewUserEvents() {
   // Step 2: API registration with email
   document.getElementById("email-registration-form")?.addEventListener("submit", (event) => {
     event.preventDefault();
+    if (currentStep !== RegistrationStep.ON_CHAIN_REGISTERED) {
+      showToast({ message: "Please complete the previous step first.", type: "error" });
+      return;
+    }
     showToast({ message: `Step 2/${totalRegistrationSteps}: Register on wirex.` });
-    registerOnApp().catch(console.error);
+
+    (async () => {
+      let success;
+      try {
+        success = await registerOnApp();
+        if (success) {
+          updateStep2Ui();
+        } else {
+          showToast({ message: "Error registering with API.", type: "error" });
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    })().catch(console.error);
   });
 }
 
-async function registerOnApp() {
-  if (currentStep !== RegistrationStep.ON_CHAIN_REGISTERED) {
-    alert("Please complete step 1 first.");
-    return;
-  }
-
-  const emailInput = document.getElementById("email") as HTMLInputElement;
-  const email = emailInput.value.trim();
-
-  if (!email) {
-    alert("Please enter a valid email address.");
-    return;
-  }
-
-  // Get user's wallet address
-  if (window.ethereum) {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
-    const userAddress = await signer.getAddress();
-
-    // Get sandbox status
-    const backendBaseUrl = "";
-    const authUrl = `${backendBaseUrl}/auth`;
-    await fetch(authUrl, { method: "GET" });
-
-    // Register user with API
-    const isSuccess = await registerUserWithApi(email, userAddress);
-
-    if (isSuccess) {
-      currentStep = RegistrationStep.API_REGISTERED;
-      alert("Registration complete! Your UbiquiCard will be available soon.");
-      // Here you could redirect to a success page or show a success message
-    }
-  } else {
-    alert("Please install a Web3 wallet like MetaMask to continue.");
-  }
-}
-
-async function registerUserWithApi(email: string, userAddress: string): Promise<boolean> {
-  try {
-    const response = await fetch(`${backendBaseUrl}/register`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify({
-        email: email,
-        wallet_address: userAddress,
-        country: "DE", // Add any other required fields based on the API documentation
-        // Add any other required fields based on the API documentation
-      }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(`API Error: ${errorData.message || response.statusText}`);
-    }
-
-    const data = await response.json();
-    console.log("API registration successful:", data);
-    return true;
-  } catch (error) {
-    console.error("Error registering with API:", error);
-    alert(`Error registering with API: ${error instanceof Error ? error.message : String(error)}`);
-    return false;
-  }
-}
-
-export function updateRegistrationUi() {
+export function updateStep1Ui() {
   const step1 = document.getElementById("step-1");
   const step2 = document.getElementById("step-2");
   if (step1) step1.style.display = "none";
   if (step2) step2.style.display = "block";
   currentStep = RegistrationStep.ON_CHAIN_REGISTERED;
+}
+
+export function updateStep2Ui() {
+  currentStep = RegistrationStep.API_REGISTERED;
+  showToast({ message: "Registration successful!" });
 }
