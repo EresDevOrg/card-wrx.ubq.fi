@@ -1,4 +1,5 @@
 import { showToast } from "../toaster";
+import { getKycLink } from "./kyc";
 import { registerOnApp } from "./on-app-register";
 import { registerOnChain } from "./on-chain-register";
 
@@ -7,6 +8,7 @@ export enum RegistrationStep {
   INITIAL,
   ON_CHAIN_REGISTERED,
   API_REGISTERED,
+  KYC,
 }
 
 const totalRegistrationSteps = 2;
@@ -61,6 +63,11 @@ export function register(): string {
           </div>
         </form>
       </div>
+
+      <div id="step-3" style="display: none;">
+        <h2>KYC</h2>
+        <p>Follow the link below to do your KYC.</p>
+      </div>
     </div>
   `;
 }
@@ -99,6 +106,7 @@ export function handleRegisterEvents() {
         if (success) {
           updateStep2Ui();
         } else {
+          updateStep2Ui(); // delete this, keeping it for testing for now
           showToast({ message: "Error registering with API.", type: "error" });
         }
       } catch (error) {
@@ -117,6 +125,10 @@ export function updateStep1Ui() {
 }
 
 export function updateStep2Ui() {
+  getKycLink().catch(console.error);
+  const step2 = document.getElementById("step-2");
+  const step3 = document.getElementById("step-3");
+  if (step2) step2.style.display = "none";
+  if (step3) step3.style.display = "block";
   currentStep = RegistrationStep.API_REGISTERED;
-  showToast({ message: "Registration successful!" });
 }
