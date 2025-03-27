@@ -38,6 +38,6 @@ export async function onRequest(ctx): Promise<Response> {
     return Response.json(data, { status: 200 });
   } catch (error) {
     console.error("Error registering with API:", error);
-    return Response.json({ message: "Registering user failed" }, { status: 500 });
+    return Response.json({ message: "User authentication failed" }, { status: 500 });
   }
 }
