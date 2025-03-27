@@ -8,6 +8,7 @@ import { handleRouting } from "./router";
 import { providersUrl } from "./constants";
 import { useRpcHandler } from "./shared/use-rpc-handler";
 import { wirexPayChain, wirexPayChainTestnet } from "./shared/wirex-pay-chain";
+import { authenticateUser } from "./shared/user-auth";
 
 const projectId = "415760038f8e330de4868120be3205b8";
 
@@ -100,6 +101,9 @@ export async function mainModule() {
   try {
     await initializeProviderAndSigner();
     console.log("Provider:", provider);
+
+    const wallet = appState.getAddress();
+    if (wallet) await authenticateUser(wallet);
 
     handleNetworkSwitch();
 
