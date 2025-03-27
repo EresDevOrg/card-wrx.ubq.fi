@@ -47,7 +47,8 @@ export function register(): string {
           <text x="20" y="170" font-family="Arial" font-size="10" fill="#FFFFFF" stroke="#000" stroke-width="0.3">Powered by WirexPayChain</text>
         </svg>
        
-        <h2><a href="javascript:;" id="register">Get your UbiquiCard</a></h2>
+        <h2><a href="javascript:;" id="register">Register to get your UbiquiCard</a></h2>
+       
       </div>
       
       <div id="step-2" style="display: none;">
