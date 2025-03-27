@@ -8,7 +8,7 @@ import { handleRouting } from "./router";
 import { providersUrl } from "./constants";
 import { useRpcHandler } from "./shared/use-rpc-handler";
 import { wirexPayChain, wirexPayChainTestnet } from "./shared/wirex-pay-chain";
-import { authenticateUser } from "./shared/user-auth";
+import { authenticateUser, clearUserAuthToken } from "./shared/user-auth";
 
 const projectId = "415760038f8e330de4868120be3205b8";
 
@@ -99,6 +99,7 @@ setupRouter();
 
 export async function mainModule() {
   try {
+    clearUserAuthToken();
     await initializeProviderAndSigner();
     console.log("Provider:", provider);
 

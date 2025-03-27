@@ -28,3 +28,7 @@ export function getUserAuthToken(): string | null {
 
   return userAuthJson.access_token;
 }
+
+export function clearUserAuthToken() {
+  localStorage.removeItem("user-auth");
+}
