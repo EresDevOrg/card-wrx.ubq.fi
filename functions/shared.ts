@@ -34,6 +34,9 @@ export async function getAccessToken(env: Env): Promise<AccessToken> {
   const res = await fetch(authUrl, options);
   if (res.status == 200) {
     const successResponse = (await res.json()) as WirexAuthResponse;
+
+    console.log("Access Token successResponse", successResponse);
+
     return {
       token: successResponse.access_token,
       isSandbox: env.USE_WIREX_SANDBOX !== "false",
@@ -41,4 +44,8 @@ export async function getAccessToken(env: Env): Promise<AccessToken> {
     };
   }
   throw new Error(`Getting access token failed: ${JSON.stringify(await res.json())}`);
+}
+
+export function isSandbox(env): boolean {
+  return env.USE_WIREX_SANDBOX !== "false";
 }
