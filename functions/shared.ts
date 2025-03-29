@@ -49,3 +49,11 @@ export async function getAccessToken(env: Env): Promise<AccessToken> {
 export function isSandbox(env): boolean {
   return env.USE_WIREX_SANDBOX !== "false";
 }
+
+export function getWirexApiAbsoluteUrl(path: string, env): string {
+  if (isSandbox(env)) {
+    return `${WIREX_API_URL_SANDBOX}/${path}`;
+  }
+
+  return `${WIREX_API_URL_PRODUCTION}/${path}`;
+}
