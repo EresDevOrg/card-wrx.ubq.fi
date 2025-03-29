@@ -1,4 +1,5 @@
 import { backendBaseUrl } from "../constants";
+import { UserAuthToken } from "./types";
 
 export async function authenticateUser(wallet: string): Promise<void> {
   const response = await fetch(`${backendBaseUrl}/user-auth`, {
@@ -12,7 +13,7 @@ export async function authenticateUser(wallet: string): Promise<void> {
     }),
   });
 
-  const data = await response.json();
+  const data: UserAuthToken = await response.json();
   console.log("user-auth response data", data);
 
   if (response.ok) {
@@ -20,13 +21,13 @@ export async function authenticateUser(wallet: string): Promise<void> {
   }
 }
 
-export function getUserAuthToken(): string | null {
+export function getUserAuthToken(): UserAuthToken | null {
   const userAuth = localStorage.getItem("user-auth");
   if (!userAuth) return null;
 
-  const userAuthJson = JSON.parse(userAuth);
+  const userAuthJson: UserAuthToken = JSON.parse(userAuth);
 
-  return userAuthJson.access_token;
+  return userAuthJson;
 }
 
 export function clearUserAuthToken() {
