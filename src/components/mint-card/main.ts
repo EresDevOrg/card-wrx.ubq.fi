@@ -1,5 +1,6 @@
-import { backendBaseUrl } from "../../constants";
+import { appState } from "../../main";
 import { getUserAuthToken } from "../../shared/user-auth";
+import { getWirexApiUrl } from "../../shared/utils";
 import { showToast } from "../toaster";
 
 export function mintCard(): string {
@@ -69,22 +70,28 @@ export function handleMintCardEvents() {
           return;
         }
 
-        // Mint virtual card using POST /api/v1/cards
-        const cardResponse = await fetch(`${backendBaseUrl}/proxy/api/v1/cards/virtual`, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${authToken.access_token}`,
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-        });
+        const wallet = appState.getAddress();
+        if (wallet) {
+          const mintUrl = `${getWirexApiUrl("/api/v1/cards/virtual", authToken.isSandbox)}`;
+          const cardResponse = await fetch(mintUrl, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${authToken.access_token}`,
+              Accept: "application/json",
+              "X-User-Wallet": wallet,
+            },
+          });
 
-        if (!cardResponse.ok) {
-          throw new Error("Failed to mint card");
+          if (!cardResponse.ok) {
+            throw new Error("Failed to mint card");
+          }
+
+          const card = await cardResponse.json();
+          showToast({ message: `Card minted successfully! Card ID: ${card.data.id}`, type: "success" });
+          console.log("card", card);
+        } else {
+          showToast({ message: "Connect your wallet first.", type: "error" });
         }
-
-        const card = await cardResponse.json();
-        alert(`Card minted successfully! Card ID: ${card.data.id}`);
       } catch (error) {
         console.error("Error:", error);
         showToast({
