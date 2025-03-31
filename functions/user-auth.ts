@@ -41,7 +41,7 @@ export async function onRequest(ctx): Promise<Response> {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        Authorization: `Bearer ${accessToken.token}`,
+        Authorization: `Bearer ${authData.access_token}`,
         "X-User-Wallet": wallet,
       },
     });
