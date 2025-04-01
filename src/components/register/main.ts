@@ -1,3 +1,4 @@
+import { getUserAuthToken } from "../../shared/user-auth";
 import { showToast } from "../toaster";
 import { getKycLink } from "./kyc";
 import { registerOnApp } from "./on-app-register";
@@ -9,9 +10,10 @@ export enum RegistrationStep {
   ON_CHAIN_REGISTERED,
   API_REGISTERED,
   KYC,
+  PHONE_REGISTERED,
 }
 
-const totalRegistrationSteps = 2;
+const totalRegistrationSteps = 4;
 
 let currentStep = RegistrationStep.INITIAL;
 
@@ -52,22 +54,40 @@ export function register(): string {
       </div>
       
       <div id="step-2" style="display: none;">
-        <h2>Complete Your Registration</h2>
-        <p>You're almost there! Please provide your email to complete the registration process.</p>
+        <h2>Register Email</h2>
+        <p>Please provide your email to complete the registration process.</p>
         <form id="email-registration-form">
           <div>
             <label for="email">Email Address:</label>
             <input type="email" id="email" name="email" required placeholder="Enter your email">
           </div>
           <div style="margin-top: 15px;">
-            <button type="submit" id="submit-email">Complete Registration</button>
+            <button type="submit" id="submit-email">Submit</button>
           </div>
         </form>
       </div>
 
       <div id="step-3" style="display: none;">
         <h2>KYC</h2>
-        <p>Follow the link below to do your KYC.</p>
+        <p>Follow the link below to do your KYC. After finishing your KYC, click Next.</p>
+        <div style="margin-top: 15px;">
+          <button type="submit" id="next-phone">Next</button>
+        </div>
+      </div>
+
+
+      <div id="step-4" style="display: none;">
+        <h2>Register your phone number</h2>
+        <p>You're almost there! Please provide your phone number to complete the registration process.</p>
+        <form id="phone-registration-form">
+          <div>
+            <label for="phone">Phone Number:</label>
+            <input type="tel" id="phone" name="phone" required placeholder="Enter your phone number">
+          </div>
+          <div style="margin-top: 15px;">
+            <button type="submit" id="submit-phone">Submit</button>
+          </div>
+        </form>
       </div>
     </div>
   `;
@@ -115,6 +135,33 @@ export function handleRegisterEvents() {
       }
     })().catch(console.error);
   });
+
+  // Step 2: API registration with email
+  document.getElementById("next-phone")?.addEventListener("click", (event) => {
+    event.preventDefault();
+    const auth = getUserAuthToken();
+
+    if (auth?.user.verification_status !== "Applied") {
+      showToast({ message: "Please complete KYC before phone verification.", type: "error" });
+      return;
+    }
+    showToast({ message: `Step 4/${totalRegistrationSteps}: Register your phone number.` });
+
+    (async () => {
+      let success;
+      try {
+        success = await registerPhone();
+        if (success) {
+          updateStep3Ui();
+        } else {
+          updateStep3Ui(); // delete this, keeping it for testing for now
+          showToast({ message: "Error confirming your phone number.", type: "error" });
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    })().catch(console.error);
+  });
 }
 
 export function updateStep1Ui() {
@@ -132,4 +179,18 @@ export function updateStep2Ui() {
   if (step2) step2.style.display = "none";
   if (step3) step3.style.display = "block";
   currentStep = RegistrationStep.API_REGISTERED;
+}
+
+export function updateStep3Ui() {
+  getKycLink().catch(console.error);
+  const step3 = document.getElementById("step-3");
+  const step4 = document.getElementById("step-4");
+  if (step3) step3.style.display = "none";
+  if (step4) step4.style.display = "block";
+  currentStep = RegistrationStep.KYC;
+}
+
+export async function registerPhone() {
+  alert("Register user phone number");
+  return true;
 }
