@@ -66,6 +66,23 @@ export function handleMintCardEvents() {
           return;
         }
 
+        const cardsUrl = `${getWirexApiUrl("/api/v1/cards?page_number=1&page_size=10", authToken.isSandbox)}`;
+        const cardsResponse = await fetch(cardsUrl, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${authToken.access_token}`,
+            Accept: "application/json",
+            "X-User-Wallet": authToken.wallet,
+          },
+        });
+
+        const cards = await cardsResponse.json();
+        if (cards.data.length > 1) {
+          console.log("cards", cards);
+          showToast({ message: `You already have a card. You cannot mint more for now.`, type: "error" });
+          return;
+        }
+
         const mintUrl = `${getWirexApiUrl("/api/v1/cards/virtual", authToken.isSandbox)}`;
         const cardResponse = await fetch(mintUrl, {
           method: "POST",
