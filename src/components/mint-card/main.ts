@@ -1,4 +1,3 @@
-import { appState } from "../../main";
 import { getUserAuthToken } from "../../shared/user-auth";
 import { getWirexApiUrl } from "../../shared/utils";
 import { showToast } from "../toaster";
@@ -53,7 +52,7 @@ export function handleMintCardEvents() {
         const user = authToken.user;
         // Check verification status (assuming the response structure matches the original logic)
         // // Change it to Approved later
-        if (user.verification_status !== "Applied") {
+        if (user.verification_status !== "Approved") {
           showToast({
             message: "You are not verified. Please complete your KYC before minting a card.",
             type: "error",
@@ -70,28 +69,23 @@ export function handleMintCardEvents() {
           return;
         }
 
-        const wallet = appState.getAddress();
-        if (wallet) {
-          const mintUrl = `${getWirexApiUrl("/api/v1/cards/virtual", authToken.isSandbox)}`;
-          const cardResponse = await fetch(mintUrl, {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${authToken.access_token}`,
-              Accept: "application/json",
-              "X-User-Wallet": wallet,
-            },
-          });
+        const mintUrl = `${getWirexApiUrl("/api/v1/cards/virtual", authToken.isSandbox)}`;
+        const cardResponse = await fetch(mintUrl, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${authToken.access_token}`,
+            Accept: "application/json",
+            "X-User-Wallet": authToken.wallet,
+          },
+        });
 
-          if (!cardResponse.ok) {
-            throw new Error("Failed to mint card");
-          }
-
-          const card = await cardResponse.json();
-          showToast({ message: `Card minted successfully! Card ID: ${card.data.id}`, type: "success" });
-          console.log("card", card);
-        } else {
-          showToast({ message: "Connect your wallet first.", type: "error" });
+        if (!cardResponse.ok) {
+          throw new Error("Failed to mint card");
         }
+
+        const card = await cardResponse.json();
+        showToast({ message: `Card minted successfully! Card ID: ${card.data.id}`, type: "success" });
+        console.log("card", card);
       } catch (error) {
         console.error("Error:", error);
         showToast({
