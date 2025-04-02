@@ -13,7 +13,7 @@ export async function authenticateUser(wallet: string): Promise<void> {
     }),
   });
 
-  const data: UserAuthToken = await response.json();
+  const data: UserAuthToken = { wallet: wallet, ...(await response.json()) };
   console.log("user-auth response data", data);
 
   if (response.ok) {
@@ -21,9 +21,9 @@ export async function authenticateUser(wallet: string): Promise<void> {
   }
 }
 
-export function getUserAuthToken(): UserAuthToken | null {
+export function getUserAuthToken(): UserAuthToken {
   const userAuth = localStorage.getItem("user-auth");
-  if (!userAuth) return null;
+  if (!userAuth) throw new Error("User is not authenticated");
 
   const userAuthJson: UserAuthToken = JSON.parse(userAuth);
 

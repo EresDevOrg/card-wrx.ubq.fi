@@ -7,6 +7,7 @@ export interface UserAuthToken {
   isSandbox: boolean;
   access_token: string;
   expires_at: number;
+  wallet: string;
   user: {
     id: string;
     email: string;
