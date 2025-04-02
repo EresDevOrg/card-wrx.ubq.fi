@@ -66,7 +66,7 @@ export function handleMintCardEvents() {
           return;
         }
 
-        const cardsUrl = `${getWirexApiUrl("/api/v1/cards?page_number=1&page_size=10", authToken.isSandbox)}`;
+        const cardsUrl = `${getWirexApiUrl("/api/v1/cards?page_number=0&page_size=10", authToken.isSandbox)}`;
         const cardsResponse = await fetch(cardsUrl, {
           method: "GET",
           headers: {
