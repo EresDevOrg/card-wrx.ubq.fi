@@ -1,9 +1,10 @@
-import { getUserAuthToken } from "../../shared/user-auth";
+import { appState } from "../../main";
+import { authenticateUser, getUserAuthToken } from "../../shared/user-auth";
 import { showToast } from "../toaster";
 import { getKycLink } from "./kyc";
 import { registerOnApp } from "./on-app-register";
 import { registerOnChain } from "./on-chain-register";
-import { registerPhone } from "./phone-register";
+import { registerPhone, SmsResponse, verifyPhone } from "./phone-register";
 
 // Step states
 export enum RegistrationStep {
@@ -17,6 +18,8 @@ export enum RegistrationStep {
 const totalRegistrationSteps = 4;
 
 let currentStep = RegistrationStep.INITIAL;
+
+let smsResponse: SmsResponse | null = null;
 
 export function register(): string {
   return `
@@ -85,6 +88,10 @@ export function register(): string {
             <label for="phone">Phone Number:</label>
             <input type="tel" id="phone" name="phone" required placeholder="Enter your phone number">
           </div>
+          <div style="display: none;">
+            <label for="phone-confirmation-code">Insert code sent to your phone number:</label>
+            <input type="text" id="phone-confirmation-code" name="phone" placeholder="Enter your phone confirmation code">
+          </div>
           <div style="margin-top: 15px;">
             <button type="submit" id="submit-phone">Submit</button>
           </div>
@@ -115,6 +122,7 @@ export function handleRegisterEvents() {
   // Step 2: API registration with email
   document.getElementById("email-registration-form")?.addEventListener("submit", (event) => {
     event.preventDefault();
+
     if (currentStep !== RegistrationStep.ON_CHAIN_REGISTERED) {
       showToast({ message: "Please complete the previous step first.", type: "error" });
       return;
@@ -140,23 +148,59 @@ export function handleRegisterEvents() {
   // Step 2: API registration with email
   document.getElementById("next-phone")?.addEventListener("click", (event) => {
     event.preventDefault();
-    const auth = getUserAuthToken();
 
-    if (auth?.user.verification_status !== "Applied") {
-      showToast({ message: "Please complete KYC before phone verification.", type: "error" });
+    const wallet = appState.getAddress();
+    if (wallet) {
+      authenticateUser(wallet)
+        .then(() => {
+          const auth = getUserAuthToken();
+          if (auth?.user.verification_status !== "Applied") {
+            showToast({ message: "Please complete KYC before phone verification.", type: "error" });
+            return;
+          }
+
+          updateStep3Ui();
+        })
+        .catch(console.error);
+    }
+  });
+
+  // Step 2: API registration with email
+  document.getElementById("phone-registration-form")?.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    const phoneNo = document.getElementById("phone") as HTMLInputElement;
+    if (!phoneNo) {
+      showToast({ message: `Phone number is required.`, type: "error" });
       return;
     }
-    showToast({ message: `Step 4/${totalRegistrationSteps}: Register your phone number.` });
+    phoneNo.setAttribute("disabled", "true");
+
+    const phoneDivs = document.getElementById("phone-registration-form")?.children;
+
+    if (phoneDivs?.[1]) {
+      (phoneDivs[1] as HTMLElement).style.display = "block";
+    }
 
     (async () => {
-      let success;
       try {
-        success = await registerPhone();
-        if (success) {
-          updateStep3Ui();
+        if (smsResponse) {
+          const isSuccess = await verifyPhone(smsResponse);
+          if (isSuccess) {
+            showToast({ message: "Your phone number has been verified.", type: "success" });
+            //updateStep3Ui();
+            const wallet = appState.getAddress();
+            if (wallet) {
+              await authenticateUser(wallet);
+            }
+          } else {
+            showToast({ message: "Invalid verification code. ", type: "error" });
+          }
         } else {
-          updateStep3Ui(); // delete this, keeping it for testing for now
-          showToast({ message: "Error confirming your phone number.", type: "error" });
+          showToast({ message: `Step 4/${totalRegistrationSteps}: Register your phone number.` });
+          smsResponse = await registerPhone(phoneNo.value);
+          showToast({ message: "An SMS has been sent to you.", type: "success" });
+          //updateStep3Ui();
         }
       } catch (error) {
         console.error(error);
