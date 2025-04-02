@@ -3,6 +3,7 @@ import { showToast } from "../toaster";
 import { getKycLink } from "./kyc";
 import { registerOnApp } from "./on-app-register";
 import { registerOnChain } from "./on-chain-register";
+import { registerPhone } from "./phone-register";
 
 // Step states
 export enum RegistrationStep {
@@ -187,9 +188,4 @@ export function updateStep3Ui() {
   if (step3) step3.style.display = "none";
   if (step4) step4.style.display = "block";
   currentStep = RegistrationStep.KYC;
-}
-
-export async function registerPhone() {
-  alert("Register user phone number");
-  return true;
 }
