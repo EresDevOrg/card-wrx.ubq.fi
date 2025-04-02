@@ -44,9 +44,6 @@ export function handleMintCardEvents() {
   document.getElementById("mint-card")?.addEventListener("click", () => {
     (async () => {
       const authToken = getUserAuthToken();
-      if (!authToken) {
-        throw new Error("You are not authenticated to mint a card.");
-      }
 
       try {
         const user = authToken.user;
