@@ -77,8 +77,8 @@ export function handleMintCardEvents() {
         });
 
         const cards = await cardsResponse.json();
+        console.log("cards", cards);
         if (cards.data.length > 1) {
-          console.log("cards", cards);
           showToast({ message: `You already have a card. You cannot mint more for now.`, type: "error" });
           return;
         }
@@ -98,7 +98,7 @@ export function handleMintCardEvents() {
         }
 
         const card = await cardResponse.json();
-        showToast({ message: `Card minted successfully! Card ID: ${card.data.id}`, type: "success" });
+        showToast({ message: `Card minted successfully! Card ID: ${card.id}`, type: "success" });
         console.log("card", card);
       } catch (error) {
         console.error("Error:", error);
