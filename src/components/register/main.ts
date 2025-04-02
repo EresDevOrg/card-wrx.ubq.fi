@@ -182,7 +182,6 @@ export function updateStep2Ui() {
 }
 
 export function updateStep3Ui() {
-  getKycLink().catch(console.error);
   const step3 = document.getElementById("step-3");
   const step4 = document.getElementById("step-4");
   if (step3) step3.style.display = "none";
