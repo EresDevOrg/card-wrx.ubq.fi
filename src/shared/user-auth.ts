@@ -21,6 +21,10 @@ export async function authenticateUser(wallet: string): Promise<void> {
   }
 }
 
+/**
+ * @throws {Error} if user is not authenticated
+ * @returns UserAuthToken
+ */
 export function getUserAuthToken(): UserAuthToken {
   const userAuth = localStorage.getItem("user-auth");
   if (!userAuth) throw new Error("User is not authenticated");
