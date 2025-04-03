@@ -1,4 +1,4 @@
-import { createHomePage } from "../components/home";
+import { addHomeEvents, createHomePage } from "../components/home";
 import { getUserAuthToken } from "../shared/user-auth";
 
 export async function loadHomePage() {
@@ -15,6 +15,7 @@ export async function loadHomePage() {
     } catch (error) {
       const content = createHomePage();
       contentArea.innerHTML = content;
+      addHomeEvents();
       console.error("Failed to load home page:", error);
     }
   }
