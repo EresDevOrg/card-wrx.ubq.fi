@@ -1,6 +1,6 @@
 import { setupRouter } from "./router";
 import { initializeState } from "./on-load";
-import { createAppKit } from "@reown/appkit";
+import { createAppKit, EventsControllerState } from "@reown/appkit";
 import { Ethers5Adapter } from "@reown/appkit-adapter-ethers5";
 import { anvil, AppKitNetwork, mainnet } from "@reown/appkit/networks";
 import { ethers } from "ethers";
@@ -92,6 +92,13 @@ export function handleNetworkSwitch() {
   // wallet connection listener
   appState.subscribeWalletInfo(() => {
     initializeProviderAndSigner().catch(console.error);
+  });
+
+  appState.subscribeEvents((event: EventsControllerState) => {
+    if (event.data.event == "DISCONNECT_SUCCESS") {
+      clearUserAuthToken();
+      window.location.reload();
+    }
   });
 }
 
