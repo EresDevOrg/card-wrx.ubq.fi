@@ -32,6 +32,10 @@ body {
     url(./fonts/ubiquity-nova-standard.ttf) format("truetype");
 }
 
+ol {
+  list-style-position: inside;
+}
+
 #nav-selector {
   display: flex;
   gap: 20px;
