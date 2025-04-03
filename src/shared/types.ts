@@ -1,3 +1,6 @@
+import { User } from "@reown/appkit";
+import { Card } from "./wirex-types";
+
 export interface GlobalState {
   isLoading: boolean;
   data: Record<string, unknown>;
@@ -8,22 +11,6 @@ export interface UserAuthToken {
   access_token: string;
   expires_at: number;
   wallet: string;
-  user: {
-    id: string;
-    email: string;
-    wallet_address: string;
-    residence_address: {
-      country: string;
-    };
-    verification_status: string;
-    user_status: string;
-    personal_info: {
-      first_name: string;
-      last_name: string;
-      nationality: string;
-    };
-    phone_number_data: {
-      phone_number: string;
-    };
-  };
+  user: User;
+  card: Card | undefined;
 }
