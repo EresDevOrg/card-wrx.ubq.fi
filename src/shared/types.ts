@@ -1,5 +1,4 @@
-import { User } from "@reown/appkit";
-import { Card } from "./wirex-types";
+import { Card, User } from "./wirex-types";
 
 export interface GlobalState {
   isLoading: boolean;
