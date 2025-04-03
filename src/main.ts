@@ -70,7 +70,10 @@ export async function initializeProviderAndSigner() {
     // web3Provider signer will handle transaction signing
     userSigner = web3Provider.getSigner(appState.getAddress());
 
-    console.log("User address:", await userSigner.getAddress());
+    const userAddress = await userSigner.getAddress();
+    console.log("User address:", userAddress);
+
+    await authenticateUser(userAddress);
   } else {
     userSigner = undefined;
   }
@@ -109,10 +112,6 @@ export async function mainModule() {
     clearUserAuthToken();
     await initializeProviderAndSigner();
     console.log("Provider:", provider);
-
-    const wallet = appState.getAddress();
-    if (wallet) await authenticateUser(wallet);
-
     handleNetworkSwitch();
 
     await initializeState();
