@@ -22,7 +22,7 @@ let currentStep = RegistrationStep.INITIAL;
 
 let smsResponse: SmsResponse | null = null;
 
-export function register(): string {
+export function getRegisterHtml(): string {
   return `
     <div class="demo-card">
       <div id="step-1">
@@ -82,7 +82,7 @@ export function register(): string {
   `;
 }
 
-export function handleRegisterEvents() {
+export function addRegisterEvents() {
   // Step 1: On-chain registration
   document.getElementById("register")?.addEventListener("click", (event) => {
     showToast({ message: `Step 1/${totalRegistrationSteps}: Register on chain.` });
@@ -135,7 +135,7 @@ export function handleRegisterEvents() {
       authenticateUser(wallet)
         .then(() => {
           const auth = getUserAuthToken();
-          if (auth?.user.verification_status !== "Applied") {
+          if (auth.user.verification_status !== "Applied") {
             showToast({ message: "Please complete KYC before phone verification.", type: "error" });
             return;
           }

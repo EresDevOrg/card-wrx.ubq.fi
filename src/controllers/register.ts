@@ -1,13 +1,18 @@
-import { handleRegisterEvents, register } from "../components/register/main";
+import { addRegisterEvents, getRegisterHtml } from "../components/register/main";
+import { appState } from "../main";
 
 export async function loadRegisterPage() {
   const contentArea = document.getElementById("content-area");
 
   if (contentArea) {
     try {
-      const content = register();
-      contentArea.innerHTML = content;
-      handleRegisterEvents();
+      if (appState.getIsConnectedState()) {
+        const content = getRegisterHtml();
+        contentArea.innerHTML = content;
+        addRegisterEvents();
+      } else {
+        throw new Error("Connect your wallet to use this page.");
+      }
     } catch (error) {
       console.error("Failed to load page:", error);
     }
