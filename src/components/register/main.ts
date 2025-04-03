@@ -27,7 +27,15 @@ export function register(): string {
     <div class="demo-card">
       <div id="step-1">
         ${getCardImage()}         
-        <h2><a href="javascript:;" id="register">Register to get your UbiquiCard</a></h2>
+        <h2>Registration Steps</h2>
+        <ol class="register-steps">
+          <li>Register on-chain</li>
+          <li>Register on the app</li>
+          <li>KYC</li>
+          <li>Verify phone number</li>
+        </ol>
+
+        <h3><a href="javascript:;" id="register">Step-1: Click here to register on-chain</a></h3>
       </div>
       
       <div id="step-2" style="display: none;">
