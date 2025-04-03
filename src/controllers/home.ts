@@ -1,8 +1,4 @@
 import { createHomePage } from "../components/home";
-import { handleMintCardEvents, mintCard } from "../components/mint-card/main";
-import { handleRegisterEvents, register } from "../components/register/main";
-
-import { appState } from "../main";
 import { getUserAuthToken } from "../shared/user-auth";
 
 export async function loadHomePage() {
@@ -11,19 +7,14 @@ export async function loadHomePage() {
   if (contentArea) {
     try {
       const auth = getUserAuthToken();
-      if (auth) {
-        const content = mintCard();
-        contentArea.innerHTML = content;
-        handleMintCardEvents();
-      } else if (appState.getIsConnectedState()) {
-        const content = register();
-        contentArea.innerHTML = content;
-        handleRegisterEvents();
+      if (!auth.card) {
+        window.location.hash = "/mint";
       } else {
-        const content = createHomePage();
-        contentArea.innerHTML = content;
+        window.location.hash = "/dashboard";
       }
     } catch (error) {
+      const content = createHomePage();
+      contentArea.innerHTML = content;
       console.error("Failed to load home page:", error);
     }
   }
