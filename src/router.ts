@@ -2,6 +2,7 @@ import { loadPage1 } from "./controllers/page1";
 import { loadPage2 } from "./controllers/page2";
 import { redirectTo404 } from "./controllers/404";
 import { loadHomePage } from "./controllers/home";
+import { loadRegisterPage } from "./controllers/register";
 
 // URL Path based routing
 export async function handleRouting() {
@@ -16,6 +17,9 @@ export async function handleRouting() {
     case "#/home":
     case "#/index":
       await loadHomePage();
+      break;
+    case "#/register":
+      await loadRegisterPage();
       break;
     case "#/page1":
       await loadPage1();
