@@ -89,7 +89,6 @@ export function getRegisterHtml(): string {
 }
 
 export function addRegisterEvents() {
-  // Step 1: On-chain registration
   document.getElementById("register")?.addEventListener("click", (event) => {
     showToast({ message: `Step 1/${totalRegistrationSteps}: Register on chain.` });
     const button = event.currentTarget as HTMLAnchorElement;
@@ -106,7 +105,6 @@ export function addRegisterEvents() {
     })().catch(console.error);
   });
 
-  // Step 2: API registration with email
   document.getElementById("email-registration-form")?.addEventListener("submit", (event) => {
     event.preventDefault();
 
@@ -123,7 +121,6 @@ export function addRegisterEvents() {
         if (success) {
           updateStep2Ui();
         } else {
-          updateStep2Ui(); // delete this, keeping it for testing for now
           showToast({ message: "Error registering with API.", type: "error" });
         }
       } catch (error) {
@@ -132,7 +129,6 @@ export function addRegisterEvents() {
     })().catch(console.error);
   });
 
-  // Step 2: API registration with email
   document.getElementById("next-phone")?.addEventListener("click", (event) => {
     event.preventDefault();
 
@@ -152,7 +148,6 @@ export function addRegisterEvents() {
     }
   });
 
-  // Step 2: API registration with email
   document.getElementById("phone-registration-form")?.addEventListener("submit", (event) => {
     event.preventDefault();
 
