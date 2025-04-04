@@ -137,7 +137,7 @@ export function addRegisterEvents() {
       authenticateUser(wallet)
         .then(() => {
           const auth = getUserAuthToken();
-          if (auth.user.verification_status !== "Applied") {
+          if (auth.user.verification_status !== "Approved") {
             showToast({ message: "Please complete KYC before phone verification.", type: "error" });
             return;
           }
