@@ -1,7 +1,7 @@
 import { appState } from "../../main";
 import { authenticateUser, getUserAuthToken } from "../../shared/user-auth";
-import { getCardImage } from "../card-svg";
 import { showToast } from "../toaster";
+import { getSupportedCountriesHtml } from "./countries-dropdown";
 import { getKycLink } from "./kyc";
 import { registerOnApp } from "./on-app-register";
 import { registerOnChain } from "./on-chain-register";
@@ -26,8 +26,8 @@ export function getRegisterHtml(): string {
   return `
     <div class="demo-card">
       <div id="step-1">
-        ${getCardImage()}         
-        <h2>Registration Steps</h2>
+        
+        <h3>Registration Steps</h3>
         <ol class="register-steps">
           <li>Register on-chain</li>
           <li>Register on the app</li>
@@ -35,7 +35,13 @@ export function getRegisterHtml(): string {
           <li>Verify phone number</li>
         </ol>
 
+        <h1>Get Started</h1>
+        <div id="country-dropdown">
+        <div>Select your country of residence:</div>
+            ${getSupportedCountriesHtml()}
+        </div>
         <h3><a href="javascript:;" id="register">Step-1: Click here to register on-chain</a></h3>
+        
       </div>
       
       <div id="step-2" style="display: none;">
@@ -108,7 +114,7 @@ export function addRegisterEvents() {
       showToast({ message: "Please complete the previous step first.", type: "error" });
       return;
     }
-    showToast({ message: `Step 2/${totalRegistrationSteps}: Register on wirex.` });
+    showToast({ message: `Step 2/${totalRegistrationSteps}: Register on the app.` });
 
     (async () => {
       let success;
