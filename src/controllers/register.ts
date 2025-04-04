@@ -1,4 +1,4 @@
-import { addRegisterEvents, getRegisterHtml } from "../components/register/main";
+import { addRegisterEvents, getRegisterHtml } from "../components/register/register";
 import { appState } from "../main";
 
 export async function loadRegisterPage() {
