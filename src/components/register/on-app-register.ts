@@ -6,8 +6,7 @@ import { getUserAuthToken2 } from "../../shared/user-auth";
 export async function registerOnApp() {
   const auth = getUserAuthToken2();
   if (auth?.user.email) {
-    showToast({ message: "Step already completed. Proceeding to next step.", type: "info" });
-    return true;
+    return true; // already registered
   }
 
   const emailInput = document.getElementById("email") as HTMLInputElement;

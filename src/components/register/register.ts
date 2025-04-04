@@ -1,5 +1,5 @@
 import { appState } from "../../main";
-import { authenticateUser, getUserAuthToken } from "../../shared/user-auth";
+import { authenticateUser, getUserAuthToken, getUserAuthToken2 } from "../../shared/user-auth";
 import { showToast } from "../toaster";
 import { getSupportedCountriesHtml } from "./countries-dropdown";
 import { getKycLink } from "./kyc";
@@ -15,8 +15,6 @@ export enum RegistrationStep {
   KYC,
   PHONE_REGISTERED,
 }
-
-const totalRegistrationSteps = 4;
 
 let currentStep = RegistrationStep.INITIAL;
 
@@ -36,7 +34,7 @@ export function getRegisterHtml(): string {
         </ol>
 
         <h1>Get Started</h1>
-        <div id="country-dropdown">
+        <div>
         <div>Select your country of residence:</div>
             ${getSupportedCountriesHtml()}
         </div>
@@ -89,8 +87,9 @@ export function getRegisterHtml(): string {
 }
 
 export function addRegisterEvents() {
+  fillPreviousRegisterAttempt();
+
   document.getElementById("register")?.addEventListener("click", (event) => {
-    showToast({ message: `Step 1/${totalRegistrationSteps}: Register on chain.` });
     const button = event.currentTarget as HTMLAnchorElement;
     button.style.pointerEvents = "none"; // Disable further clicks
     (async () => {
@@ -112,7 +111,6 @@ export function addRegisterEvents() {
       showToast({ message: "Please complete the previous step first.", type: "error" });
       return;
     }
-    showToast({ message: `Step 2/${totalRegistrationSteps}: Register on the app.` });
 
     (async () => {
       let success;
@@ -138,7 +136,7 @@ export function addRegisterEvents() {
         .then(() => {
           const auth = getUserAuthToken();
           if (auth.user.verification_status !== "Approved") {
-            showToast({ message: "Please complete KYC before phone verification.", type: "error" });
+            showToast({ message: "Please complete KYC before next step.", type: "error" });
             return;
           }
 
@@ -179,7 +177,6 @@ export function addRegisterEvents() {
             showToast({ message: "Invalid verification code. ", type: "error" });
           }
         } else {
-          showToast({ message: `Step 4/${totalRegistrationSteps}: Register your phone number.` });
           smsResponse = await registerPhone(phoneNo.value);
           showToast({ message: "An SMS has been sent to you.", type: "success" });
           //updateStep3Ui();
@@ -214,4 +211,27 @@ export function updateStep3Ui() {
   if (step3) step3.style.display = "none";
   if (step4) step4.style.display = "block";
   currentStep = RegistrationStep.KYC;
+}
+
+function fillPreviousRegisterAttempt() {
+  const auth = getUserAuthToken2();
+
+  if (auth?.user.residence_address.country) {
+    const countryDropdown = document.getElementById("country-dropdown") as HTMLSelectElement;
+    const country = auth.user.residence_address.country;
+    const option = Array.from(countryDropdown.options).find((opt) => {
+      return opt.value === country;
+    });
+
+    if (option) {
+      countryDropdown.value = option.value;
+      countryDropdown.disabled = true;
+    }
+  }
+
+  if (auth?.user.email) {
+    const emailInput = document.getElementById("email") as HTMLInputElement;
+    emailInput.value = auth.user.email;
+    emailInput.disabled = true;
+  }
 }
