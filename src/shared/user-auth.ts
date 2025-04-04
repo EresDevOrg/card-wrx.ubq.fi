@@ -34,6 +34,15 @@ export function getUserAuthToken(): UserAuthToken {
   return userAuthJson;
 }
 
+export function getUserAuthToken2(): UserAuthToken | null {
+  const userAuth = localStorage.getItem("user-auth");
+  if (!userAuth) return null;
+
+  const userAuthJson: UserAuthToken = JSON.parse(userAuth);
+
+  return userAuthJson;
+}
+
 export function clearUserAuthToken() {
   localStorage.removeItem("user-auth");
 }

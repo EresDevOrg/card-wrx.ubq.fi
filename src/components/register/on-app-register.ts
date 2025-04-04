@@ -1,8 +1,15 @@
 import { ethers } from "ethers";
 import { backendBaseUrl } from "../../constants";
 import { showToast } from "../toaster";
+import { getUserAuthToken2 } from "../../shared/user-auth";
 
 export async function registerOnApp() {
+  const auth = getUserAuthToken2();
+  if (auth?.user.email) {
+    showToast({ message: "Step already completed. Proceeding to next step.", type: "info" });
+    return true;
+  }
+
   const emailInput = document.getElementById("email") as HTMLInputElement;
   const email = emailInput.value.trim();
 
