@@ -1,8 +1,9 @@
 import { backendBaseUrl } from "../constants";
 import { UserAuthToken } from "./types";
+import { getWirexApiUrl } from "./utils";
 
 export async function authenticateUser(wallet: string): Promise<void> {
-  const response = await fetch(`${backendBaseUrl}/user-auth`, {
+  const responseAuth = await fetch(`${backendBaseUrl}/user-auth`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -13,11 +14,27 @@ export async function authenticateUser(wallet: string): Promise<void> {
     }),
   });
 
-  const data: UserAuthToken = { wallet: wallet, ...(await response.json()) };
-  console.log("user-auth response data", data);
+  const auth: UserAuthToken = { wallet: wallet, ...(await responseAuth.json()) };
 
-  if (response.ok) {
-    localStorage.setItem("user-auth", JSON.stringify(data));
+  console.log("user-auth response data", auth);
+
+  if (responseAuth.ok) {
+    const cardsUrl = `${getWirexApiUrl("/api/v1/cards?page_number=0&page_size=10", auth.isSandbox)}`;
+    const cardsResponse = await fetch(cardsUrl, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${auth.access_token}`,
+        Accept: "application/json",
+        "X-User-Wallet": auth.wallet,
+      },
+    });
+
+    const cards = await cardsResponse.json();
+    console.log("cards", cards);
+    if (cards.data.length > 0) {
+      auth.card = cards.data[0]; // per specs, deal with only one card for now
+    }
+    localStorage.setItem("user-auth", JSON.stringify(auth));
   }
 }
 
