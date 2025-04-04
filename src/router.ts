@@ -1,4 +1,4 @@
-import { loadPage1 } from "./controllers/page1";
+import { loadCardsPage } from "./controllers/cards";
 import { loadPage2 } from "./controllers/page2";
 import { redirectTo404 } from "./controllers/404";
 import { loadHomePage } from "./controllers/home";
@@ -21,8 +21,8 @@ export async function handleRouting() {
     case "#/register":
       await loadRegisterPage();
       break;
-    case "#/page1":
-      await loadPage1();
+    case "#/cards":
+      await loadCardsPage();
       break;
     case "#/page2":
       await loadPage2();
