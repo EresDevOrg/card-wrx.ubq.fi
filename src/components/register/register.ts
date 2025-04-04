@@ -59,6 +59,7 @@ export function getRegisterHtml(): string {
       <div id="step-3" style="display: none;">
         <h2>KYC</h2>
         <p>Follow the link below to do your KYC. After finishing your KYC, click Next.</p>
+        <div id="kyc-link"></div>
         <div style="margin-top: 15px;">
           <button type="submit" id="next-phone">Next</button>
         </div>

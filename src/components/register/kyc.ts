@@ -17,14 +17,14 @@ export async function getKycLink(): Promise<void> {
 
   if (response.ok) {
     console.log("kyc link response data", data);
-    const step3 = document.getElementById("step-3");
+    const kycLink = document.getElementById("kyc-link");
     const element = document.createElement("a");
     element.href = data.redirect_uri;
     element.innerText = data.redirect_uri;
     element.target = "_blank";
-    if (step3) {
-      step3.appendChild(element);
-      step3.style.display = "block";
+    if (kycLink) {
+      kycLink.appendChild(element);
+      kycLink.style.display = "block";
     }
   }
 
