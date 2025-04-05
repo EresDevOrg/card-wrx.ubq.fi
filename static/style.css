@@ -215,3 +215,125 @@ a:active {
     max-width: none; /* Allow full width on smaller screens */
   }
 }
+
+/** card details */
+.container {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #14142b;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  color: #e0e0e0;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  align-items: center;
+}
+
+.detail-label {
+  font-weight: bold;
+  color: #fff;
+}
+
+.read-only {
+  color: #ccc;
+}
+
+.editable-field {
+  background-color: #1a1a2e;
+  color: #fff;
+  border: 1px solid #333;
+  padding: 8px;
+  border-radius: 4px;
+  width: 150px;
+}
+
+.action-button {
+  background-color: #3f51b5;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.3s ease;
+  margin-left: 10px;
+}
+
+.action-button:hover {
+  background-color: #283593;
+}
+
+.card-number-container {
+  display: flex;
+  align-items: center;
+}
+
+.cvv-container {
+  display: flex;
+  align-items: center;
+}
+
+.transactions-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.transactions-table th,
+.transactions-table td {
+  border: 1px solid #333;
+  padding: 8px;
+  text-align: left;
+}
+
+.transactions-table th {
+  background-color: #1a1a2e;
+  color: #fff;
+}
+
+.toaster-container {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+}
+
+.toast {
+  background-color: #222;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  margin-top: 10px;
+  opacity: 0.9;
+}
+
+@media (max-width: 600px) {
+  .container {
+    margin: 10px;
+    padding: 15px;
+  }
+
+  .detail-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .editable-field,
+  .action-button {
+    width: 100%;
+    margin-top: 5px;
+    margin-left: 0;
+  }
+
+  .card-number-container,
+  .cvv-container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
