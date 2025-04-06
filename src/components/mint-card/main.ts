@@ -12,7 +12,7 @@ export function mintCard(): string {
     `;
 }
 
-export function handleMintCardEvents() {
+export function addMintCardEvents() {
   document.getElementById("mint-card")?.addEventListener("click", () => {
     (async () => {
       const authToken = getUserAuthToken();

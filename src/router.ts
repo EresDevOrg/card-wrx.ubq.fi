@@ -4,6 +4,7 @@ import { redirectTo404 } from "./controllers/404";
 import { loadHomePage } from "./controllers/home";
 import { loadRegisterPage } from "./controllers/register";
 import { loadCardSettingsPage } from "./controllers/card-settings";
+import { loadMintPage } from "./controllers/mint-card";
 
 // URL Path based routing
 export async function handleRouting() {
@@ -23,6 +24,9 @@ export async function handleRouting() {
       break;
     case route === "#/register":
       await loadRegisterPage();
+      break;
+    case route === "#/mint":
+      await loadMintPage();
       break;
     case route === "#/page2":
       await loadPage2();
