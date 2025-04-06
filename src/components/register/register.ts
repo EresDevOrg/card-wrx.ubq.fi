@@ -23,27 +23,32 @@ let smsResponse: SmsResponse | null = null;
 export function getRegisterHtml(): string {
   return `
     <div class="demo-card">
-      <div id="step-1">
+      <div id="step-0">
         
-        <h3>Registration Steps</h3>
+        <h1>Registration Steps</h1>
         <ol class="register-steps">
           <li>Register on-chain</li>
           <li>Register on the app</li>
           <li>KYC</li>
           <li>Verify phone number</li>
         </ol>
-
-        <h1>Get Started</h1>
-        <div>
         <div>Select your country of residence:</div>
             ${getSupportedCountriesHtml()}
-        </div>
-        <h3><a href="javascript:;" id="register">Step-1: Click here to register on-chain</a></h3>
+       
+       
+        <h3><a href="javascript:;" id="init-register">Click here to get started</a></h3>
+        
+      </div>
+      <div id="step-1"  style="display: none;">
+        <h1>Step-1/4: Register on-chain</h1>
+        <div>
+        
+        <h3><a href="javascript:;" id="register">Click here to register on-chain</a></h3>
         
       </div>
       
       <div id="step-2" style="display: none;">
-        <h2>Register Email</h2>
+        <h2>Step-2/4: Register Email</h2>
         <p>Please provide your email to complete the registration process.</p>
         <form id="email-registration-form">
           <div>
@@ -57,7 +62,7 @@ export function getRegisterHtml(): string {
       </div>
 
       <div id="step-3" style="display: none;">
-        <h2>KYC</h2>
+        <h2>Step-3/4: KYC</h2>
         <p>Follow the link below to do your KYC. After finishing your KYC, click Next.</p>
         <div id="kyc-link"></div>
         <div style="margin-top: 15px;">
@@ -67,7 +72,7 @@ export function getRegisterHtml(): string {
 
 
       <div id="step-4" style="display: none;">
-        <h2>Register your phone number</h2>
+        <h2>Step4/4: Register your phone number</h2>
         <p>You're almost there! Please provide your phone number to complete the registration process.</p>
         <form id="phone-registration-form">
           <div>
@@ -89,6 +94,14 @@ export function getRegisterHtml(): string {
 
 export function addRegisterEvents() {
   fillPreviousRegisterAttempt();
+
+  document.getElementById("init-register")?.addEventListener("click", () => {
+    const step0 = document.getElementById("step-0");
+    const step1 = document.getElementById("step-1");
+    if (step0) step0.style.display = "none";
+    if (step1) step1.style.display = "block";
+    currentStep = RegistrationStep.INITIAL;
+  });
 
   document.getElementById("register")?.addEventListener("click", (event) => {
     const button = event.currentTarget as HTMLAnchorElement;
