@@ -1,3 +1,6 @@
+import { getUserAuthToken2 } from "../shared/user-auth";
+import { showToast } from "./toaster";
+
 export function getCardsHtml(): string {
   return `
   <div class="card-list">
@@ -9,36 +12,36 @@ export function getCardsHtml(): string {
 
 export function addCardsEvents() {
   // Sample data for demonstration
-  const virtualCards = [
-    {
-      id: "card123",
-      status: "Active",
-      balances: [
-        { token_symbol: "USD", token_address: "usd_address", balance: 125.5, is_active: true },
-        { token_symbol: "EUR", token_address: "eur_address", balance: 80.2, is_active: true },
-      ],
-      limit: { daily_limit: 500, daily_usage: 150 },
-      created_at: "2024-07-20T10:00:00Z",
-      updated_at: "2024-07-21T14:30:00Z",
-    },
-    {
-      id: "card456",
-      status: "NotActivated",
-      balances: [{ token_symbol: "USD", token_address: "usd_address", balance: 0.0, is_active: true }],
-      limit: { daily_limit: 1000, daily_usage: 0 },
-      created_at: "2025-01-15T09:15:00Z",
-      updated_at: null,
-    },
-    {
-      id: "card789",
-      status: "Blocked",
-      balances: [{ token_symbol: "USD", token_address: "usd_address", balance: 55.75, is_active: true }],
-      limit: { daily_limit: 200, daily_usage: 200 },
-      created_at: "2024-11-01T16:45:00Z",
-      updated_at: "2024-11-05T08:00:00Z",
-    },
-    // Add more card objects here
-  ];
+  // const virtualCards = [
+  //   {
+  //     id: "card123",
+  //     status: "Active",
+  //     balances: [
+  //       { token_symbol: "USD", token_address: "usd_address", balance: 125.5, is_active: true },
+  //       { token_symbol: "EUR", token_address: "eur_address", balance: 80.2, is_active: true },
+  //     ],
+  //     limit: { daily_limit: 500, daily_usage: 150 },
+  //     created_at: "2024-07-20T10:00:00Z",
+  //     updated_at: "2024-07-21T14:30:00Z",
+  //   },
+  //   {
+  //     id: "card456",
+  //     status: "NotActivated",
+  //     balances: [{ token_symbol: "USD", token_address: "usd_address", balance: 0.0, is_active: true }],
+  //     limit: { daily_limit: 1000, daily_usage: 0 },
+  //     created_at: "2025-01-15T09:15:00Z",
+  //     updated_at: null,
+  //   },
+  //   {
+  //     id: "card789",
+  //     status: "Blocked",
+  //     balances: [{ token_symbol: "USD", token_address: "usd_address", balance: 55.75, is_active: true }],
+  //     limit: { daily_limit: 200, daily_usage: 200 },
+  //     created_at: "2024-11-01T16:45:00Z",
+  //     updated_at: "2024-11-05T08:00:00Z",
+  //   },
+  //   // Add more card objects here
+  // ];
 
   const cardListDiv = document.querySelector(".card-list");
   const genericCardSvg = `
@@ -52,7 +55,13 @@ export function addCardsEvents() {
     </svg>
 `;
 
-  virtualCards.forEach((card) => {
+  const auth = getUserAuthToken2();
+  if (!auth) {
+    showToast({ message: "Please login to view your cards.", type: "error" });
+    return;
+  }
+
+  auth.cards?.forEach((card) => {
     const cardContainer = document.createElement("div");
     cardContainer.classList.add("card-container");
 
