@@ -2,12 +2,7 @@ import { getUserAuthToken2 } from "../shared/user-auth";
 import { showToast } from "./toaster";
 
 export function getCardsHtml(): string {
-  return `
-  <div class="card-list">
-            
-    </div>
-
-  `;
+  return `<div class="card-list"></div>`;
 }
 
 export function addCardsEvents() {
@@ -73,16 +68,18 @@ export function addCardsEvents() {
     const cardDetails = document.createElement("div");
     cardDetails.classList.add("card-details");
     cardDetails.innerHTML = `
-        <p><strong>ID:</strong> <span class="card-id">${card.id}</span></p>
+        <p><strong>${card.card_data.format} ${card.card_data.payment_system} :</strong> <span class="card-id">xxxx xxxx xxxx ${card.card_data.card_number_last_4} ${card.card_data.expiry_date}</span></p>
         <p><strong>Status:</strong> <span class="card-status">${card.status}</span></p>
         <p><strong>Balances:</strong>
             <ul class="balances-list">
-                ${card.balances.map((balance) => `<li><strong>${balance.token_symbol}:</strong> <span class="balance-${balance.token_symbol.toLowerCase()}">${balance.balance.toFixed(2)}</span></li>`).join("")}
+                ${card.balances.map((balance) => `<li><strong>${balance.token_symbol}:</strong> <span class="balance-${balance.token_symbol.toLowerCase()}">${balance.balance.toFixed(2)}</span> <span>${balance.is_active ? "(Active)" : ""}</span></li>`).join("")}
             </ul>
         </p>
-        <p><strong>Limit:</strong> Daily: <span class="daily-limit">${card.limit.daily_limit}</span> / Used: <span class="daily-usage">${card.limit.daily_usage}</span></p>
+        <p><strong>Limit:</strong> Daily: <span class="daily-limit">${card.limit.daily_limit ? card.limit.daily_limit : 0}</span> / Used: <span class="daily-usage">${card.limit.daily_usage ? card.limit.daily_usage : 0}</span></p>
         <p><strong>Created At:</strong> <span class="created-at">${new Date(card.created_at).toLocaleDateString()} ${new Date(card.created_at).toLocaleTimeString()}</span></p>
         <p><strong>Updated At:</strong> <span class="updated-at">${card.updated_at ? `${new Date(card.updated_at).toLocaleDateString()} ${new Date(card.updated_at).toLocaleTimeString()}` : "N/A"}</span></p>
+        <p><strong>ID:</strong> <span class="card-id">${card.id}</span></p>
+        
     `;
     cardContainer.appendChild(cardDetails);
 
