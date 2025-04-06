@@ -32,6 +32,9 @@ export async function getAccessToken(env: Env): Promise<AccessToken> {
 
   const authUrl = env.USE_WIREX_SANDBOX === "false" ? WIREX_AUTH_URL_PRODUCTION : WIREX_AUTH_URL_SANDBOX;
   const res = await fetch(authUrl, options);
+
+  console.log("Response status:", res.status);
+
   if (res.status == 200) {
     const successResponse = (await res.json()) as WirexAuthResponse;
 
