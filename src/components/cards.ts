@@ -36,7 +36,7 @@ export function addCardsEvents() {
     const cardDetails = document.createElement("div");
     cardDetails.classList.add("card-details");
     cardDetails.innerHTML = `
-        <p><strong>${card.card_data.format} ${card.card_data.payment_system} :</strong> <span class="card-id">xxxx xxxx xxxx ${card.card_data.card_number_last_4} ${card.card_data.expiry_date}</span></p>
+        <p><strong>${card.card_data.format} ${card.card_data.payment_system} :</strong> <span class="card-id">${card.card_data.card_number_last_4} ${card.card_data.expiry_date}</span></p>
         <p><strong>Status:</strong> <span class="card-status">${card.status}</span></p>
         <p><strong>Balances:</strong>
             <ul class="balances-list">
