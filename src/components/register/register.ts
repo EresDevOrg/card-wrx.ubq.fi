@@ -41,7 +41,7 @@ export function getRegisterHtml(): string {
       </div>
       <div id="step-1"  style="display: none;">
         <h1>Step-1/4: Register on-chain</h1>
-        <div>
+        
         
         <h3><a href="javascript:;" id="register">Click here to register on-chain</a></h3>
         
