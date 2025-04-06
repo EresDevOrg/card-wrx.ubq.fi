@@ -36,14 +36,14 @@ export function getRegisterHtml(): string {
             ${getSupportedCountriesHtml()}
        
        
-        <h3><a href="javascript:;" id="init-register">Click here to get started</a></h3>
+        <h3><a href="javascript:;" id="init-register" class="button">Get started</a></h3>
         
       </div>
       <div id="step-1"  style="display: none;">
         <h1>Step-1/4: Register on-chain</h1>
         
         
-        <h3><a href="javascript:;" id="register">Click here to register on-chain</a></h3>
+        <div><a href="javascript:;" id="register" class="button">Register on-chain</a></div>
         
       </div>
       
@@ -56,7 +56,7 @@ export function getRegisterHtml(): string {
             <input type="email" id="email" name="email" required placeholder="Enter your email">
           </div>
           <div style="margin-top: 15px;">
-            <button type="submit" id="submit-email">Submit</button>
+            <button type="submit" id="submit-email" class="button">Submit</button>
           </div>
         </form>
       </div>
@@ -66,7 +66,7 @@ export function getRegisterHtml(): string {
         <p>Follow the link below to do your KYC. After finishing your KYC, click Next.</p>
         <div id="kyc-link"></div>
         <div style="margin-top: 15px;">
-          <button type="submit" id="next-phone">Next</button>
+          <button type="submit" id="next-phone" class="button">Next</button>
         </div>
       </div>
 
@@ -84,7 +84,7 @@ export function getRegisterHtml(): string {
             <input type="text" id="phone-confirmation-code" name="phone" placeholder="Enter your phone confirmation code">
           </div>
           <div style="margin-top: 15px;">
-            <button type="submit" id="submit-phone">Submit</button>
+            <button type="submit" id="submit-phone" class="button">Submit</button>
           </div>
         </form>
       </div>
