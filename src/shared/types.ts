@@ -11,5 +11,5 @@ export interface UserAuthToken {
   expires_at: number;
   wallet: string;
   user: User;
-  card: Card | undefined;
+  cards: Card[] | undefined;
 }

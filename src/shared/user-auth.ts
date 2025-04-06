@@ -32,7 +32,7 @@ export async function authenticateUser(wallet: string): Promise<void> {
     const cards = await cardsResponse.json();
     console.log("cards", cards);
     if (cards.data.length > 0) {
-      auth.card = cards.data[0]; // per specs, deal with only one card for now
+      auth.cards = cards.data; // per specs, deal with only one card for now
     }
     localStorage.setItem("user-auth", JSON.stringify(auth));
   }
