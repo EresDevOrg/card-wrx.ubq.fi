@@ -90,7 +90,7 @@ export function addCardsEvents() {
     cardActions.classList.add("card-actions");
     const settingsButton = document.createElement("a");
     settingsButton.href = `#/cards/${card.id}`;
-    settingsButton.innerHTML = '<button class="settings-button">Settings</button>';
+    settingsButton.innerHTML = '<button class="settings-button button">Settings</button>';
     cardActions.appendChild(settingsButton);
     cardContainer.appendChild(cardActions);
 
