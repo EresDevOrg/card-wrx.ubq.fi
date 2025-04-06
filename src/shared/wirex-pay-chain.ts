@@ -1,8 +1,8 @@
 import { defineChain } from "@reown/appkit/networks";
 
 export const wirexPayChainTestnet = defineChain({
-  id: 230378335,
-  caipNetworkId: "eip155:230378335",
+  id: 1001996,
+  caipNetworkId: "eip155:1001996",
   chainNamespace: "eip155",
   name: "WirexPayChain Testnet",
   nativeCurrency: {
@@ -12,12 +12,12 @@ export const wirexPayChainTestnet = defineChain({
   },
   rpcUrls: {
     default: {
-      http: ["https://wirex-devnet-rpc.eu-north-2.gateway.fm"],
+      http: ["https://rpc-dev.wirexpaychain.com"],
       webSocket: [],
     },
   },
   blockExplorers: {
-    default: { name: "Explorer", url: "https://wirex-devnet-blockscout.eu-north-2.gateway.fm" },
+    default: { name: "Explorer", url: "https://explorer-dev.wirexpaychain.com" },
   },
   contracts: {
     // Add the contracts here

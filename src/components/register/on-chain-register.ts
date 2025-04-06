@@ -48,7 +48,7 @@ async function setupNetworkAndContract(responseJson: AccessToken) {
   const isSandbox = responseJson.isSandbox;
   await appState.switchNetwork(isSandbox ? wirexPayChainTestnet : wirexPayChain);
 
-  return isSandbox ? "0x3fe04562Fc28b4152F24A41E8A8c3899E6B8c433" : "0x2766F66E572C94a4cbc57f4d5bd2aD71900edF30";
+  return isSandbox ? "0x062AfB76614dd594A99e70fD2CfbDf417CCF8797" : "0x2766F66E572C94a4cbc57f4d5bd2aD71900edF30";
 }
 
 async function registerNewUser(provider: ethers.providers.JsonRpcProvider, contractAddress: string) {
