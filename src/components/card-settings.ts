@@ -65,7 +65,6 @@ export function getCardSettingsHtml(cardId: string): string {
             <div class="cvv-container">
                 <span id="cvv-masked">xxx</span>
                 <button class="action-button" id="reveal-cvv">Reveal</button>
-                <span id="cvv-actual" style="display: none;"></span>
             </div>
         </div>
         <div class="detail-row">
@@ -160,7 +159,6 @@ export function addCardSettingsEvents(cardId: string) {
   const cardExpiryElement = document.getElementById("card-expiry") as HTMLSpanElement;
   const cvvMaskedElement = document.getElementById("cvv-masked") as HTMLSpanElement;
   const revealCvvButton = document.getElementById("reveal-cvv") as HTMLButtonElement;
-  const cvvActualElement = document.getElementById("cvv-actual") as HTMLSpanElement;
   const spendingLimitInput = document.getElementById("spending-limit-input") as HTMLInputElement;
   const saveSpendingLimitButton = document.getElementById("save-spending-limit") as HTMLButtonElement;
   const transactionsBody = document.getElementById("transactions-body") as HTMLTableSectionElement;
@@ -231,14 +229,10 @@ export function addCardSettingsEvents(cardId: string) {
 
   revealCardNumberButton.addEventListener("click", () => {
     showFullCardNumbers(card).catch(console.error);
-    revealCardNumberButton.style.display = "none";
   });
 
   revealCvvButton.addEventListener("click", () => {
-    cvvMaskedElement.style.display = "none";
-    cvvActualElement.textContent = missingCardDetails.cvv ?? "N/A";
-    cvvActualElement.style.display = "inline";
-    revealCvvButton.style.display = "none";
+    executeWithOtp(getCvvCode, cvvMaskedElement, card).catch(console.error);
   });
 
   saveSpendingLimitButton.addEventListener("click", () => {
@@ -341,4 +335,66 @@ export async function getCardNumbers(cardId: string, actionToken: string, auth: 
     card_number: string;
     expiry_date: string;
   };
+}
+
+export async function executeWithOtp(
+  callback: (cardId: string, actionToken: string, auth: UserAuthToken) => Promise<string | null>,
+  element: HTMLElement,
+  card: Card
+) {
+  const auth = getUserAuthToken2();
+  if (!auth) {
+    return false;
+  }
+  const smsSendData = await sendOtpForAction(auth, "GetCardDetails");
+  if (smsSendData) {
+    await showPopup({
+      title: "Confirm OTP",
+      message: "Please enter the OTP sent to your phone number.",
+      shouldShowCancelButton: true,
+      onConfirm: async (otp) => {
+        if (otp) {
+          const smsVerifyData: { token: string } = await verifyOtp(otp, auth, smsSendData);
+          if (!smsVerifyData) {
+            showToast({ message: "Failed to verify OTP.", type: "error" });
+            return;
+          }
+
+          const text = await callback(card.id, smsVerifyData.token, auth);
+
+          if (text) {
+            element.textContent = text;
+          }
+        }
+      },
+      isPrompt: true,
+      inputPlaceholder: "Enter OTP",
+    });
+  }
+}
+
+export async function getCvvCode(cardId: string, actionToken: string, auth: UserAuthToken) {
+  const response = await fetch(getWirexApiUrl(`/api/v1/cards/${cardId}/cvv`, auth.isSandbox), {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${auth.access_token}`,
+      "X-User-Wallet": auth.wallet,
+    },
+    body: JSON.stringify({
+      action_token: actionToken,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    console.error("Error fetching cvv:", JSON.stringify(errorData));
+    return null;
+  }
+
+  const data: { cvv: string } = await response.json();
+  console.log("CVV retrieved successfully:", data);
+
+  return data.cvv;
 }
