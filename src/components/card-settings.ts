@@ -70,14 +70,6 @@ export function getCardSettingsHtml(cardId: string): string {
                 <button class="action-button" id="reveal-cvv">Reveal</button>
             </div>
         </div>
-        <div class="detail-row">
-            <span class="detail-label">Spending Limit:</span>
-            <div>
-                <input type="number" class="editable-field" id="spending-limit-input">
-                <button class="action-button" id="save-spending-limit">Save</button>
-            </div>
-        </div>
-
         <h3>Transaction History</h3>
         <table class="transactions-table">
             <thead>
@@ -107,20 +99,6 @@ export function addCardSettingsEvents(cardId: string) {
   if (!card) {
     return;
   }
-  interface MissingCardDetails {
-    cardNumber?: string;
-    cvv?: string;
-    spendingLimit?: number;
-    id?: string;
-  }
-
-  // Example Missing Card Details
-  const missingCardDetails: MissingCardDetails = {
-    cardNumber: "4111111111111234",
-    cvv: "123",
-    spendingLimit: 300,
-    id: "card123",
-  };
 
   interface Transaction {
     id: string;
@@ -163,8 +141,6 @@ export function addCardSettingsEvents(cardId: string) {
   const cardExpiryElement = document.getElementById("card-expiry") as HTMLSpanElement;
   const cvvMaskedElement = document.getElementById("cvv-masked") as HTMLSpanElement;
   const revealCvvButton = document.getElementById("reveal-cvv") as HTMLButtonElement;
-  const spendingLimitInput = document.getElementById("spending-limit-input") as HTMLInputElement;
-  const saveSpendingLimitButton = document.getElementById("save-spending-limit") as HTMLButtonElement;
   const transactionsBody = document.getElementById("transactions-body") as HTMLTableSectionElement;
 
   function formatDate(dateString: string): string {
@@ -199,7 +175,6 @@ export function addCardSettingsEvents(cardId: string) {
     statusButton.textContent = card.status === "Blocked" ? "Unblock" : "Block";
     cardNumberMaskedElement.textContent = `xxxx xxxx xxxx ${card.card_data.card_number_last_4 ?? "****"}`;
     cardExpiryElement.textContent = `Expiry: ${card.card_data.expiry_date ?? "xx/xx"}`;
-    spendingLimitInput.value = missingCardDetails.spendingLimit ? missingCardDetails.spendingLimit.toString() : "";
   }
 
   function renderTransactions(): void {
@@ -241,16 +216,6 @@ export function addCardSettingsEvents(cardId: string) {
 
   revealCvvButton.addEventListener("click", () => {
     executeWithOtp(getCvvCode, cvvMaskedElement, card).catch(console.error);
-  });
-
-  saveSpendingLimitButton.addEventListener("click", () => {
-    const newLimit = parseFloat(spendingLimitInput.value);
-    if (!isNaN(newLimit) && missingCardDetails.spendingLimit !== undefined) {
-      missingCardDetails.spendingLimit = newLimit;
-      showToast({ message: `Spending limit updated to ${newLimit}.`, type: "success" });
-    } else {
-      showToast({ message: "Invalid spending limit.", type: "error" });
-    }
   });
 
   updateCardDetails();
