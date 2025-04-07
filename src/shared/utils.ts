@@ -1,6 +1,9 @@
 import { ethers } from "ethers";
-import { userSigner } from "../main";
 import { WIREX_API_URL_PRODUCTION, WIREX_API_URL_SANDBOX } from "../../functions/shared";
+import { SmsResponse } from "../components/register/phone-register";
+import { showToast } from "../components/toaster";
+import { userSigner } from "../main";
+import { UserAuthToken } from "./types";
 
 export async function sign(message: string): Promise<string> {
   try {
@@ -29,4 +32,59 @@ export function getWirexApiUrl(path: string, sandbox: boolean): string {
   }
 
   return `${WIREX_API_URL_PRODUCTION}${path}`;
+}
+
+export async function sendOtpForAction(auth: UserAuthToken, action: "GetCardDetails" | "ConfirmPhone"): Promise<SmsResponse | null> {
+  const smsUrl = getWirexApiUrl("/api/v1/confirmation/sms", auth.isSandbox);
+  const responseSms = await fetch(smsUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${auth.access_token}`,
+      "X-User-Wallet": auth.wallet,
+    },
+    body: JSON.stringify({
+      action_type: action,
+    }),
+  });
+
+  if (!responseSms.ok) {
+    const errorData = await responseSms.json();
+    showToast({ message: "Error sending OTP SMS. ", type: "error" });
+    console.log(`Error sending confirmation sms ${JSON.stringify(errorData)}`);
+    return null;
+  }
+
+  const smsSendData = await responseSms.json();
+  console.log("Phone confirmation code sent successfully:", smsSendData);
+  return smsSendData;
+}
+
+export async function verifyOtp(otp: string, auth: UserAuthToken, smsResponse: SmsResponse) {
+  const smsVerifyUrl = getWirexApiUrl("/api/v1/confirmation/sms/verify", auth.isSandbox);
+  const responseVerify = await fetch(smsVerifyUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${auth.access_token}`,
+      "X-User-Wallet": auth.wallet,
+    },
+    body: JSON.stringify({
+      code: otp,
+      session_id: smsResponse.session_id,
+    }),
+  });
+
+  if (!responseVerify.ok) {
+    const errorData = await responseVerify.json();
+    console.error("Error verifying code", JSON.stringify(errorData));
+    return null;
+  }
+
+  const smsVerifyData = await responseVerify.json();
+  console.log("Phone number verified successfully:", smsVerifyData);
+
+  return smsVerifyData;
 }
