@@ -1,6 +1,8 @@
+import { UserAuthToken } from "../shared/types";
 import { getUserAuthToken2 } from "../shared/user-auth";
-import { getWirexApiUrl } from "../shared/utils";
+import { getWirexApiUrl, sendOtpForAction, verifyOtp } from "../shared/utils";
 import { Card } from "../shared/wirex-types";
+import { showPopup } from "./popup";
 import { showToast } from "./toaster";
 
 export function getCardSettingsHtml(cardId: string): string {
@@ -54,8 +56,8 @@ export function getCardSettingsHtml(cardId: string): string {
             <span class="detail-label">Card No:</span>
             <div class="card-number-container">
                 <span id="card-number-masked"></span>
-                <button class="action-button" id="reveal-card-number">Reveal</button>
                 <span id="card-expiry" style="margin-left: 10px;"></span>
+                 <button class="action-button" id="reveal-card-number">Reveal</button>
             </div>
         </div>
         <div class="detail-row">
@@ -78,8 +80,16 @@ export function getCardSettingsHtml(cardId: string): string {
         <table class="transactions-table">
             <thead>
                 <tr>
-                    <th>ID</th>￼
-CAKE
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="transactions-body">
+                </tbody>
+        </table>
 
     </div>
 
@@ -220,7 +230,7 @@ export function addCardSettingsEvents(cardId: string) {
   });
 
   revealCardNumberButton.addEventListener("click", () => {
-    cardNumberMaskedElement.textContent = missingCardDetails.cardNumber ?? "N/A";
+    showFullCardNumbers(card).catch(console.error);
     revealCardNumberButton.style.display = "none";
   });
 
@@ -269,4 +279,66 @@ export async function toggleStatus(card: Card): Promise<boolean> {
   const errorData = await responseToggleStatus.json();
   console.error("Error in status toggle", JSON.stringify(errorData));
   return false;
+}
+
+export async function showFullCardNumbers(card: Card) {
+  const auth = getUserAuthToken2();
+  if (!auth) {
+    return false;
+  }
+  const smsSendData = await sendOtpForAction(auth, "GetCardDetails");
+  if (smsSendData) {
+    await showPopup({
+      title: "Confirm OTP",
+      message: "Please enter the OTP sent to your phone number.",
+      shouldShowCancelButton: true,
+      onConfirm: async (otp) => {
+        if (otp) {
+          const smsVerifyData: { token: string } = await verifyOtp(otp, auth, smsSendData);
+          if (!smsVerifyData) {
+            showToast({ message: "Failed to verify OTP.", type: "error" });
+            return;
+          }
+
+          const cardNumbers = await getCardNumbers(card.id, smsVerifyData.token, auth);
+
+          if (cardNumbers) {
+            const cardNumberMaskedElement = document.getElementById("card-number-masked") as HTMLSpanElement;
+            cardNumberMaskedElement.textContent = cardNumbers.card_number;
+          }
+        }
+      },
+      isPrompt: true,
+      inputPlaceholder: "Enter OTP",
+    });
+  }
+}
+
+export async function getCardNumbers(cardId: string, actionToken: string, auth: UserAuthToken) {
+  const response = await fetch(getWirexApiUrl(`/api/v1/cards/${cardId}/details`, auth.isSandbox), {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${auth.access_token}`,
+      "X-User-Wallet": auth.wallet,
+    },
+    body: JSON.stringify({
+      action_token: actionToken,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    console.error("Error fetching card numbers:", JSON.stringify(errorData));
+    return null;
+  }
+
+  const data = await response.json();
+  console.log("Card numbers retrieved successfully:", data);
+
+  return data as {
+    card_number: string;
+    expiry_date: string;
+  };
 }

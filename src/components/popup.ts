@@ -5,7 +5,7 @@ export interface PopupOptions {
   shouldShowCancelButton?: boolean;
   confirmText?: string;
   cancelText?: string;
-  onConfirm?: (input?: string) => void;
+  onConfirm?: (input?: string) => Promise<void>;
   onCancel?: () => void;
   isPrompt?: boolean;
   inputPlaceholder?: string;
@@ -85,10 +85,10 @@ export function showPopup(options: PopupOptions): Promise<string | boolean | und
     confirmButton.addEventListener("click", () => {
       removePopup(backdrop);
       if (isPrompt && inputElement) {
-        onConfirm?.(inputElement.value);
+        onConfirm?.(inputElement.value).catch(console.error);
         resolve(inputElement.value);
       } else {
-        onConfirm?.();
+        onConfirm?.().catch(console.error);
         resolve(true);
       }
     });
