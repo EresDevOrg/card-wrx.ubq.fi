@@ -70,23 +70,7 @@ export function getCardSettingsHtml(cardId: string): string {
                 <button class="action-button" id="reveal-cvv">Reveal</button>
             </div>
         </div>
-        <h3>Transaction History</h3>
-        <table class="transactions-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Date</th>
-                    <th>Description</th>
-                    <th>Amount</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody id="transactions-body">
-                </tbody>
-        </table>
-
     </div>
-
   `;
 }
 
@@ -98,32 +82,6 @@ export function addCardSettingsEvents(cardId: string) {
   }
   if (!card) {
     return;
-  }
-
-  interface Transaction {
-    id: string;
-    date: Date;
-    description: string;
-    amount: string;
-    status: "Pending" | "Completed" | "Failed";
-  }
-
-  const transactions: Transaction[] = [];
-  const numberOfTransactions = 20;
-  const transactionDescriptions = ["Online Purchase", "Restaurant Bill", "ATM Withdrawal", "Transfer Received", "Subscription Payment"];
-  const transactionStatuses: ("Pending" | "Completed" | "Failed")[] = ["Pending", "Completed", "Failed"];
-
-  for (let i = 0; i < numberOfTransactions; i++) {
-    const amount = (0.54545 * 100).toFixed(2);
-    const typeIndex = Math.floor(0.545222 * transactionDescriptions.length);
-    const statusIndex = Math.floor(0.12334 * transactionStatuses.length);
-    transactions.push({
-      id: `txn${i + 1}`,
-      date: new Date(Date.now() - 0.21459 * 30 * 24 * 60 * 60 * 1000), // Last 30 days
-      description: transactionDescriptions[typeIndex],
-      amount: (i % 2 === 0 ? "-" : "+") + amount + " USDT",
-      status: transactionStatuses[statusIndex],
-    });
   }
 
   const cardIdElement = document.getElementById("card-id") as HTMLSpanElement;
@@ -141,7 +99,6 @@ export function addCardSettingsEvents(cardId: string) {
   const cardExpiryElement = document.getElementById("card-expiry") as HTMLSpanElement;
   const cvvMaskedElement = document.getElementById("cvv-masked") as HTMLSpanElement;
   const revealCvvButton = document.getElementById("reveal-cvv") as HTMLButtonElement;
-  const transactionsBody = document.getElementById("transactions-body") as HTMLTableSectionElement;
 
   function formatDate(dateString: string): string {
     const date = new Date(dateString);
@@ -177,25 +134,6 @@ export function addCardSettingsEvents(cardId: string) {
     cardExpiryElement.textContent = `Expiry: ${card.card_data.expiry_date ?? "xx/xx"}`;
   }
 
-  function renderTransactions(): void {
-    transactionsBody.innerHTML = "";
-    transactions.sort((a, b) => b.date.getTime() - a.date.getTime()); // Sort by date descending
-    transactions.forEach((txn) => {
-      const row = transactionsBody.insertRow();
-      const idCell = row.insertCell();
-      const dateCell = row.insertCell();
-      const descriptionCell = row.insertCell();
-      const amountCell = row.insertCell();
-      const statusCell = row.insertCell();
-
-      idCell.textContent = txn.id;
-      dateCell.textContent = txn.date.toLocaleDateString() + " " + txn.date.toLocaleTimeString();
-      descriptionCell.textContent = txn.description;
-      amountCell.textContent = txn.amount;
-      statusCell.textContent = txn.status;
-    });
-  }
-
   statusButton.addEventListener("click", () => {
     (async () => {
       const isSuccess = await toggleStatus(card);
@@ -219,7 +157,6 @@ export function addCardSettingsEvents(cardId: string) {
   });
 
   updateCardDetails();
-  renderTransactions();
 }
 
 export async function toggleStatus(card: Card): Promise<boolean> {
