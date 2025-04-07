@@ -337,3 +337,132 @@ a:active {
     align-items: flex-start;
   }
 }
+
+/* popup.css */
+.popup-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1001; /* Higher than toaster */
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.popup-backdrop.show {
+  opacity: 1;
+}
+
+.popup-container {
+  background-color: #1a1a2e; /* Use your card background color or similar */
+  color: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  min-width: 300px;
+  max-width: 90%; /* Responsive width */
+  opacity: 0;
+  transform: translateY(-20px);
+  transition:
+    opacity 0.3s ease-in-out,
+    transform 0.3s ease-in-out;
+  font-family: "Proxima Nova", "Ubiquity Nova", sans-serif;
+}
+
+.popup-container.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.popup-title {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #fff;
+}
+
+.popup-message {
+  margin-bottom: 20px;
+  color: #e0e0e0;
+}
+
+.popup-input {
+  width: calc(100% - 20px);
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #333;
+  border-radius: 4px;
+  background-color: #222;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.popup-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.popup-button {
+  background-color: #3f51b5; /* Your button color */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.popup-button:hover {
+  background-color: #283593; /* Darker shade on hover */
+}
+
+.popup-button-cancel {
+  background-color: #777; /* Grey for cancel */
+}
+
+.popup-button-cancel:hover {
+  background-color: #555;
+}
+
+/* Type specific styling (optional) */
+.popup-info {
+  border-top: 5px solid #42a5f5; /* Blue */
+}
+
+.popup-warning {
+  border-top: 5px solid #ffa726; /* Orange */
+}
+
+.popup-error {
+  border-top: 5px solid #ef5350; /* Red */
+}
+
+.popup-success {
+  border-top: 5px solid #66bb6a; /* Green */
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .popup-container {
+    padding: 15px;
+    min-width: auto;
+    width: 95%;
+  }
+
+  .popup-buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .popup-button {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+}
