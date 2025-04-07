@@ -18,15 +18,18 @@ export function getCardSettingsHtml(cardId: string): string {
   return `
  <div class="container">
         <h2>${card.card_data.format} ${card.card_data.payment_system} ${card.card_data.card_number_last_4}</h2>
-      
+    
         <div class="detail-row">
             <span class="detail-label">ID:</span>
             <span class="read-only" id="card-id">${cardId}</span>
         </div>
-
         <div class="detail-row">
             <span class="detail-label">User Email:</span>
             <span class="read-only" id="user-email"></span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Phone:</span>
+            <span class="read-only" id="user-phone"></span>
         </div>
         <div class="detail-row">
             <span class="detail-label">Limit:</span>
@@ -148,6 +151,7 @@ export function addCardSettingsEvents(cardId: string) {
   const cardIdElement = document.getElementById("card-id") as HTMLSpanElement;
   const userNameElement = document.getElementById("user-name") as HTMLSpanElement;
   const userEmailElement = document.getElementById("user-email") as HTMLSpanElement;
+  const userPhoneElement = document.getElementById("user-phone") as HTMLSpanElement;
   const cardLimitElement = document.getElementById("card-limit") as HTMLSpanElement;
   const createdAtElement = document.getElementById("created-at") as HTMLSpanElement;
   const updatedAtElement = document.getElementById("updated-at") as HTMLSpanElement;
@@ -180,6 +184,10 @@ export function addCardSettingsEvents(cardId: string) {
     userNameElement.textContent = card.card_data.name_on_card;
     if (auth?.user.email) {
       userEmailElement.textContent = auth.user.email;
+    }
+
+    if (auth?.user.phone_number_data.phone_number) {
+      userPhoneElement.textContent = `${auth?.user.phone_number_data.phone_number} (${auth?.user.phone_number_data?.is_confirmed ? "Confirmed" : "Not Confirmed"})`;
     }
 
     cardLimitElement.textContent = `Daily: ${card.limit.daily_limit ? card.limit.daily_limit : 0} / Used: ${card.limit.daily_usage ? card.limit.daily_usage : 0}`;

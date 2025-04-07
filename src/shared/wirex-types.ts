@@ -70,5 +70,6 @@ export interface User {
   };
   phone_number_data: {
     phone_number: string;
+    is_confirmed: boolean;
   };
 }
