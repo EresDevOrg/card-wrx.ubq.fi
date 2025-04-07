@@ -50,10 +50,10 @@ export function addMintCardEvents() {
 
         const cards = await cardsResponse.json();
         console.log("cards", cards);
-        if (cards.data.length > 1) {
-          showToast({ message: `You already have a card. You cannot mint more for now.`, type: "error" });
-          return;
-        }
+        // if (cards.data.length > 1) {
+        //   showToast({ message: `You already have a card. You cannot mint more for now.`, type: "error" });
+        //   return;
+        // }
 
         const mintUrl = `${getWirexApiUrl("/api/v1/cards/virtual", authToken.isSandbox)}`;
         const cardResponse = await fetch(mintUrl, {
