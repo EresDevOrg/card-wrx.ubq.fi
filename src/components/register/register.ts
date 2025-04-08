@@ -97,7 +97,7 @@ export function getRegisterHtml(): string {
 }
 
 export function addRegisterEvents() {
-  fillPreviousRegisterAttempt();
+  restoreLastRegisterAttempt();
 
   document.getElementById("init-register")?.addEventListener("click", () => {
     const step0 = document.getElementById("step-0");
@@ -231,7 +231,7 @@ export function updateStep3Ui() {
   currentStep = RegistrationStep.KYC;
 }
 
-function fillPreviousRegisterAttempt() {
+function restoreLastRegisterAttempt() {
   const auth = getUserAuthToken2();
 
   if (auth?.user.residence_address.country) {
