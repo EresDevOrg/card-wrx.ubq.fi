@@ -1,7 +1,7 @@
-import { getUserAuthToken } from "../../shared/user-auth";
-import { getWirexApiUrl } from "../../shared/utils";
-import { getCardImage } from "../card-svg";
-import { showToast } from "../toaster";
+import { getUserAuthToken } from "../shared/user-auth";
+import { getWirexApiUrl } from "../shared/utils";
+import { getCardImage } from "./card-svg";
+import { showToast } from "./toaster";
 
 export function mintCard(): string {
   return `

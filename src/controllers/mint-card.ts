@@ -1,4 +1,4 @@
-import { addMintCardEvents, mintCard } from "../components/mint-card/main";
+import { addMintCardEvents, mintCard } from "../components/mint-card";
 import { showToast } from "../components/toaster";
 import { appState } from "../main";
 
