@@ -63,7 +63,11 @@ export function getRegisterHtml(): string {
 
       <div id="step-3" style="display: none;">
         <h2>Step-3/4: KYC</h2>
-        <p>Follow the link below to do your KYC. After finishing your KYC, click Next.</p>
+        <div>
+          <p>Follow the link below to perform your KYC. After finishing your KYC, click Next.</p>
+          <p>You will be able to go to next step only if your KYC is approved.</p>
+          <p>Make sure you complete all steps in the KYC.</p>
+        </div>
         <div id="kyc-link"></div>
         <div style="margin-top: 15px;">
           <button type="submit" id="next-phone" class="button">Next</button>
@@ -72,7 +76,7 @@ export function getRegisterHtml(): string {
 
 
       <div id="step-4" style="display: none;">
-        <h2>Step4/4: Register your phone number</h2>
+        <h2>Step-4/4: Register your phone number</h2>
         <p>You're almost there! Please provide your phone number to complete the registration process.</p>
         <form id="phone-registration-form">
           <div>
