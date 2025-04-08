@@ -149,7 +149,7 @@ export function addCardSettingsEvents(cardId: string) {
   });
 
   revealCardNumberButton.addEventListener("click", () => {
-    showFullCardNumbers(card).catch(console.error);
+    executeWithOtp(getCardNumbers, cardNumberMaskedElement, card).catch(console.error);
   });
 
   revealCvvButton.addEventListener("click", () => {
@@ -185,39 +185,6 @@ export async function toggleStatus(card: Card): Promise<boolean> {
   return false;
 }
 
-export async function showFullCardNumbers(card: Card) {
-  const auth = getUserAuthToken2();
-  if (!auth) {
-    return false;
-  }
-  const smsSendData = await sendOtpForAction(auth, "GetCardDetails");
-  if (smsSendData) {
-    await showPopup({
-      title: "Confirm OTP",
-      message: "Please enter the OTP sent to your phone number.",
-      shouldShowCancelButton: true,
-      onConfirm: async (otp) => {
-        if (otp) {
-          const smsVerifyData: { token: string } = await verifyOtp(otp, auth, smsSendData);
-          if (!smsVerifyData) {
-            showToast({ message: "Failed to verify OTP.", type: "error" });
-            return;
-          }
-
-          const cardNumbers = await getCardNumbers(card.id, smsVerifyData.token, auth);
-
-          if (cardNumbers) {
-            const cardNumberMaskedElement = document.getElementById("card-number-masked") as HTMLSpanElement;
-            cardNumberMaskedElement.textContent = cardNumbers.card_number;
-          }
-        }
-      },
-      isPrompt: true,
-      inputPlaceholder: "Enter OTP",
-    });
-  }
-}
-
 export async function getCardNumbers(cardId: string, actionToken: string, auth: UserAuthToken) {
   const response = await fetch(getWirexApiUrl(`/api/v1/cards/${cardId}/details`, auth.isSandbox), {
     method: "POST",
@@ -238,13 +205,13 @@ export async function getCardNumbers(cardId: string, actionToken: string, auth: 
     return null;
   }
 
-  const data = await response.json();
-  console.log("Card numbers retrieved successfully:", data);
-
-  return data as {
+  const data: {
     card_number: string;
     expiry_date: string;
-  };
+  } = await response.json();
+  console.log("Card numbers retrieved successfully:", data);
+
+  return data.card_number;
 }
 
 export async function executeWithOtp(
