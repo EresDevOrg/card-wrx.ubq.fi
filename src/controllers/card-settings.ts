@@ -1,4 +1,4 @@
-import { addCardSettingsEvents, getCardSettingsHtml } from "../components/card-settings";
+import { addCardSettingsEvents, getCardSettingsHtml } from "../components/card-settings/card-settings";
 import { showToast } from "../components/toaster";
 import { appState } from "../main";
 

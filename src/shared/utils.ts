@@ -88,3 +88,12 @@ export async function verifyOtp(otp: string, auth: UserAuthToken, smsResponse: S
 
   return smsVerifyData;
 }
+
+export function formatDate(dateString: string): string {
+  const date = new Date(dateString);
+  return (
+    date.toLocaleDateString("en-US", { year: "numeric", month: "numeric", day: "numeric" }) +
+    " " +
+    date.toLocaleTimeString("en-US", { hour: "numeric", minute: "numeric", second: "numeric", hour12: true })
+  );
+}
