@@ -189,8 +189,9 @@ export function addRegisterEvents() {
         if (smsResponse) {
           const isSuccess = await verifyPhone(smsResponse);
           if (isSuccess) {
-            showToast({ message: "Your phone number has been verified.", type: "success" });
-            //updateStep3Ui();
+            showToast({ message: "Your phone number has been verified. Your registration is complete.", type: "success" });
+            const step4 = document.getElementById("step-4");
+            if (step4) step4.style.display = "none";
             const wallet = appState.getAddress();
             if (wallet) {
               await authenticate(wallet);
