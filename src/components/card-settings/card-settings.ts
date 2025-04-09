@@ -2,8 +2,8 @@ import { getUserAuthToken2 } from "../../shared/user-auth";
 import { formatDate } from "../../shared/utils";
 import { Card } from "../../shared/wirex-types";
 import { showToast } from "../toaster";
-import { toggleStatus, updateActiveBalance, updateCardLimit } from "./card-actions";
-import { executeWithOtp, getCardNumbers, getCvvCode } from "./otp-handlers";
+import { toggleStatus, updateActiveBalance, updateCardLimit } from "./non-otp-actions";
+import { executeWithOtp, getCardNumbers, getCvvCode } from "./otp-actions";
 
 export function getCardSettingsHtml(cardId: string): string {
   const auth = getUserAuthToken2();
