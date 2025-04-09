@@ -15,7 +15,6 @@ export async function handleRouting() {
 
   // Normalize route to handle default case
   const route = window.location.hash || "#/home";
-  let cardId;
 
   switch (
     true // Switch on 'true' to allow for more complex conditions
@@ -36,8 +35,7 @@ export async function handleRouting() {
       await loadCardsPage(); // Optionally load a general cards overview page
       break;
     case route.startsWith("#/cards/"):
-      cardId = route.substring("#/cards/".length);
-      await loadCardSettingsPage(cardId); // Call a new function to load the specific card's details
+      await loadCardSettingsPage(); // Call a new function to load the specific card's details
       break;
     case route === "#/transactions":
       await loadTransactionsPage(); // Optionally load a general cards overview page
