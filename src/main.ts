@@ -56,7 +56,6 @@ export async function initializeProviderAndSigner() {
   }
 
   // if user is connected, set up the signer using the injected provider (window.ethereum)
-  console.log("main appState.getIsConnectedState()", appState.getIsConnectedState());
   if (appState.getIsConnectedState() && window.ethereum) {
     const ethereum = window.ethereum as ethers.providers.ExternalProvider;
     if (ethereum.request) {
