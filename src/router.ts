@@ -3,7 +3,6 @@ import { loadCardSettingsPage } from "./controllers/card-settings";
 import { loadCardsPage } from "./controllers/cards";
 import { loadHomePage } from "./controllers/home";
 import { loadMintPage } from "./controllers/mint-card";
-import { loadPage2 } from "./controllers/page2";
 import { loadRegisterPage } from "./controllers/register";
 import { loadTransactionsPage } from "./controllers/transaction-history";
 
@@ -27,9 +26,6 @@ export async function handleRouting() {
       break;
     case route === "#/mint":
       await loadMintPage();
-      break;
-    case route === "#/page2":
-      await loadPage2();
       break;
     case route === "#/cards":
       await loadCardsPage(); // Optionally load a general cards overview page
