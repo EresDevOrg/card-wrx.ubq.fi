@@ -1,7 +1,7 @@
 import { getAccessToken } from "./shared";
 import { Context } from "./types";
 
-export async function onRequest(ctx: Context): Promise<Response> {
+export async function onRequestPost(ctx: Context): Promise<Response> {
   try {
     const accessToken = await getAccessToken(ctx.env);
 

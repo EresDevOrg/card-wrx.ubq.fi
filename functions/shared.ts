@@ -1,21 +1,9 @@
-import { WirexAuthResponse } from "./types";
+import { AccessToken, Env, WirexAuthResponse } from "./types";
 
 export const WIREX_AUTH_URL_SANDBOX = "https://wirex-pay-dev.eu.auth0.com/oauth/token";
 export const WIREX_AUTH_URL_PRODUCTION = "https://wirex-pay-dev.eu.auth0.com/oauth/token";
 export const WIREX_API_URL_SANDBOX = "https://api-business.wirexpaychain.tech";
 export const WIREX_API_URL_PRODUCTION = "https://api-business.wirexpaychain.tech";
-
-export interface Env {
-  USE_WIREX_SANDBOX: string;
-  WIREX_CLIENT_ID: string;
-  WIREX_CLIENT_SECRET: string;
-}
-
-export interface AccessToken {
-  token: string;
-  isSandbox: boolean;
-  expiresIn: number; // in seconds
-}
 
 export async function getAccessToken(env: Env): Promise<AccessToken> {
   console.log("Using Wirex Sandbox:", env.USE_WIREX_SANDBOX !== "false");

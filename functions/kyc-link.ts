@@ -1,19 +1,14 @@
-import { validateRequestMethod } from "./register";
 import { getAccessToken } from "./shared";
 import { Context } from "./types";
 
-export async function onRequest(ctx: Context): Promise<Response> {
+export async function onRequestPost(ctx: Context): Promise<Response> {
   try {
-    validateRequestMethod(ctx.request.method, "POST");
     const accessToken = await getAccessToken(ctx.env);
-    const result = await ctx.request.json();
-    // if (!result.success) {
-    //   throw new Error(`Invalid post parameters: ${JSON.stringify(result)}`);
-    // }
+    const result: { wallet: string } = await ctx.request.json();
+
     console.log("result", result);
     const { wallet } = result;
 
-    // API endpoint from WirexPayChain partner documentation
     console.log("Is sandbox: ", accessToken.isSandbox);
     const apiBaseUrl = accessToken.isSandbox ? "https://api-business.wirexpaychain.tech" : "https://api.wirexpaychain.com";
 
