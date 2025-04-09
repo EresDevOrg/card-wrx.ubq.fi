@@ -48,13 +48,3 @@ export async function handleRouting() {
       break;
   }
 }
-
-export function setupRouter() {
-  if (typeof window !== "undefined") {
-    window.addEventListener("hashchange", () => {
-      handleRouting().catch(console.error);
-    });
-
-    handleRouting().catch(console.error);
-  }
-}

@@ -1,14 +1,13 @@
-import { setupRouter } from "./router";
-import { initializeState } from "./on-load";
 import { createAppKit, EventsControllerState } from "@reown/appkit";
 import { Ethers5Adapter } from "@reown/appkit-adapter-ethers5";
 import { anvil, AppKitNetwork, mainnet } from "@reown/appkit/networks";
 import { ethers } from "ethers";
-import { handleRouting } from "./router";
 import { providersUrl } from "./constants";
+import { initializeState } from "./on-load";
+import { handleRouting } from "./router";
 import { useRpcHandler } from "./shared/use-rpc-handler";
-import { wirexPayChain, wirexPayChainTestnet } from "./shared/wirex-pay-chain";
 import { authenticateUser, clearUserAuthToken } from "./shared/user-auth";
+import { wirexPayChain, wirexPayChainTestnet } from "./shared/wirex-pay-chain";
 
 const projectId = "415760038f8e330de4868120be3205b8";
 
@@ -105,8 +104,6 @@ export function handleNetworkSwitch() {
   });
 }
 
-setupRouter();
-
 export async function mainModule() {
   try {
     clearUserAuthToken();
@@ -117,7 +114,15 @@ export async function mainModule() {
     await initializeState();
     console.log("State initialized");
 
-    await handleRouting();
+    const appkitState = appState.getState();
+    if (appkitState.initialized) {
+      await handleRouting();
+      if (typeof window !== "undefined") {
+        window.addEventListener("hashchange", () => {
+          handleRouting().catch(console.error);
+        });
+      }
+    }
   } catch (error) {
     console.error("Error in main: ", error);
   }

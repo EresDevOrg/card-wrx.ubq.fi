@@ -1,5 +1,4 @@
 import { addCardsEvents, getCardsHtml } from "../components/cards";
-import { showToast } from "../components/toaster";
 import { appState } from "../main";
 
 export async function loadCardsPage() {
@@ -12,7 +11,7 @@ export async function loadCardsPage() {
         contentArea.innerHTML = content;
         addCardsEvents();
       } else {
-        showToast({ message: "Connect your wallet to use this page.", type: "error" });
+        contentArea.innerHTML = `<div class="connect-request">Connect your wallet to use this page.</div>`;
       }
     } catch (error) {
       console.error("Failed to load cards page:", error);

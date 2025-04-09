@@ -11,7 +11,7 @@ export async function loadRegisterPage() {
         contentArea.innerHTML = content;
         addRegisterEvents();
       } else {
-        throw new Error("Connect your wallet to use this page.");
+        contentArea.innerHTML = `<div class="connect-request">Connect your wallet to use this page.</div>`;
       }
     } catch (error) {
       console.error("Failed to load page:", error);
