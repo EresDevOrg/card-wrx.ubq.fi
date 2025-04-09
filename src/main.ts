@@ -9,7 +9,7 @@ import { useRpcHandler } from "./shared/use-rpc-handler";
 import { authenticate, clearSession } from "./shared/user-session";
 import { wirexPayChain, wirexPayChainTestnet } from "./shared/wirex-pay-chain";
 
-const projectId = "415760038f8e330de4868120be3205b8";
+const projectId = "f8d73ee74421cc7790740554fa587b94";
 
 const metadata = {
   name: "UbiquiCard",
