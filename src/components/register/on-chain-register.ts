@@ -5,7 +5,7 @@ import { wirexPayChain, wirexPayChainTestnet } from "../../shared/wirex-pay-chai
 import { showToast } from "../toaster";
 import { AccessToken } from "../../../functions/types";
 
-export async function registerOnChain(button: HTMLAnchorElement) {
+export async function registerOnChain(button: HTMLButtonElement) {
   try {
     const authData = await authenticateUser();
     if (!authData) throw new Error("Error authenticating.");

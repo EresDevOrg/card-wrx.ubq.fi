@@ -36,14 +36,14 @@ export function getRegisterHtml(): string {
             ${getSupportedCountriesHtml()}
        
        
-        <h3><a href="javascript:;" id="init-register" class="button">Get started</a></h3>
+        <h3><button id="init-register" class="button">Get started</button></h3>
         
       </div>
       <div id="step-1"  style="display: none;">
         <h1>Step-1/4: Register on-chain</h1>
         
         
-        <div><a href="javascript:;" id="register" class="button">Register on-chain</a></div>
+        <div><button id="register" class="button">Register on-chain</button></div>
         
       </div>
       
@@ -108,7 +108,7 @@ export function addRegisterEvents() {
   });
 
   document.getElementById("register")?.addEventListener("click", (event) => {
-    const button = event.currentTarget as HTMLAnchorElement;
+    const button = event.currentTarget as HTMLButtonElement;
     button.style.pointerEvents = "none"; // Disable further clicks
     (async () => {
       try {
