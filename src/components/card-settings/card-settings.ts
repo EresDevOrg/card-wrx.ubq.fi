@@ -5,7 +5,14 @@ import { showToast } from "../toaster";
 import { toggleStatus, updateActiveBalance, updateCardLimit } from "./non-otp-actions";
 import { executeWithOtp, getCardNumbers, getCvvCode } from "./otp-actions";
 
-export function getCardSettingsHtml(cardId: string): string {
+export function getCardSettingsHtml(): string {
+  const hash = window.location.hash;
+  const cardId = hash.split("/").pop();
+
+  if (!cardId) {
+    return `<div class="container"><h2>Card ID not found in URL</h2></div>`;
+  }
+
   const session = getSession();
   let card: Card | null = null;
   if (session) {
@@ -89,7 +96,10 @@ export function getCardSettingsHtml(cardId: string): string {
   `;
 }
 
-export function addCardSettingsEvents(cardId: string) {
+export function addCardSettingsEvents() {
+  const hash = window.location.hash;
+  const cardId = hash.split("/").pop();
+
   const session = getSession();
   let card: Card | null = null;
   if (session) {
@@ -124,6 +134,11 @@ export function addCardSettingsEvents(cardId: string) {
       const newLimit = parseInt(newCardLimitElement.value);
       if (isNaN(newLimit)) {
         showToast({ message: "Please enter a valid limit.", type: "error" });
+        return;
+      }
+
+      if (!cardId) {
+        showToast({ message: "Card ID is missing.", type: "error" });
         return;
       }
 
@@ -164,6 +179,10 @@ export function addCardSettingsEvents(cardId: string) {
   updateBalanceButton.addEventListener("click", () => {
     (async () => {
       const selectedTokenAddress = newActiveBalanceElement.value;
+      if (!cardId) {
+        showToast({ message: "Card ID is missing.", type: "error" });
+        return;
+      }
       const isSuccess = await updateActiveBalance(cardId, selectedTokenAddress);
 
       if (isSuccess) {

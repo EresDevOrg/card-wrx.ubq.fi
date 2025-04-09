@@ -1,15 +1,15 @@
 import { addCardSettingsEvents, getCardSettingsHtml } from "../components/card-settings/card-settings";
 import { appState } from "../main";
 
-export async function loadCardSettingsPage(cardId: string) {
+export async function loadCardSettingsPage() {
   const contentArea = document.getElementById("content-area");
 
   if (contentArea) {
     try {
       if (appState.getIsConnectedState()) {
-        const content = getCardSettingsHtml(cardId);
+        const content = getCardSettingsHtml();
         contentArea.innerHTML = content;
-        addCardSettingsEvents(cardId);
+        addCardSettingsEvents();
       } else {
         contentArea.innerHTML = `<div class="connect-request">Connect your wallet to use this page.</div>`;
       }
