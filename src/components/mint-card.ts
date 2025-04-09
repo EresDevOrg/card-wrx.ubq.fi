@@ -2,6 +2,7 @@ import { getSession } from "../shared/user-session";
 import { getWirexApiUrl } from "../shared/utils";
 import { getCardImage } from "./card-svg";
 import { showToast } from "./toaster";
+import { showPopup } from "./popup";
 
 export function mintCard(): string {
   return `
@@ -18,6 +19,19 @@ export function addMintCardEvents() {
       const session = getSession();
       if (!session) {
         showToast({ message: "Connect your wallet.", type: "error" });
+        return;
+      }
+
+      const shouldMint = await showPopup({
+        title: "Mint New Card?",
+        message: "Are you sure you want to mint a new card?",
+        shouldShowCancelButton: true,
+        confirmText: "Yes",
+        cancelText: "No",
+      });
+
+      if (shouldMint !== true) {
+        showToast({ message: "Minting cancelled", type: "info" });
         return;
       }
 
