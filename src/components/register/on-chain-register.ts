@@ -1,9 +1,9 @@
 import { ethers } from "ethers";
-import { AccessToken } from "../../../functions/shared";
 import { backendBaseUrl } from "../../constants";
 import { appState } from "../../main";
 import { wirexPayChain, wirexPayChainTestnet } from "../../shared/wirex-pay-chain";
 import { showToast } from "../toaster";
+import { AccessToken } from "../../../functions/types";
 
 export async function registerOnChain(button: HTMLAnchorElement) {
   try {

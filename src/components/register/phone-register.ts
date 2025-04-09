@@ -1,4 +1,4 @@
-import { getUserAuthToken } from "../../shared/user-auth";
+import { getSession } from "../../shared/user-session";
 import { getWirexApiUrl } from "../../shared/utils";
 import { showToast } from "../toaster";
 
@@ -11,15 +11,19 @@ export interface SmsResponse {
 }
 
 export async function registerPhone(phone: string): Promise<SmsResponse> {
-  const authToken = getUserAuthToken();
-  const updatePhoneUrl = getWirexApiUrl("/api/v1/user/phone-number", authToken.isSandbox);
+  const session = getSession();
+  if (!session) {
+    showToast({ message: "Authentication failed. Try again by refreshing this page.", type: "error" });
+    throw new Error("Authentication failed");
+  }
+  const updatePhoneUrl = getWirexApiUrl("/api/v1/user/phone-number", session.isSandbox);
   const response = await fetch(updatePhoneUrl, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
-      Authorization: `Bearer ${authToken.access_token}`,
-      "X-User-Wallet": authToken.wallet,
+      Authorization: `Bearer ${session.access_token}`,
+      "X-User-Wallet": session.wallet,
     },
     body: JSON.stringify({
       phone_number: phone,
@@ -34,14 +38,14 @@ export async function registerPhone(phone: string): Promise<SmsResponse> {
 
   console.log("Phone confirmation code sent successfully");
 
-  const smsUrl = getWirexApiUrl("/api/v1/confirmation/sms", authToken.isSandbox);
+  const smsUrl = getWirexApiUrl("/api/v1/confirmation/sms", session.isSandbox);
   const responseSms = await fetch(smsUrl, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
-      Authorization: `Bearer ${authToken.access_token}`,
-      "X-User-Wallet": authToken.wallet,
+      Authorization: `Bearer ${session.access_token}`,
+      "X-User-Wallet": session.wallet,
     },
     body: JSON.stringify({
       action_type: "ConfirmPhone",
@@ -60,18 +64,23 @@ export async function registerPhone(phone: string): Promise<SmsResponse> {
 }
 
 export async function verifyPhone(smsResponse: SmsResponse) {
-  const authToken = getUserAuthToken();
+  const session = getSession();
+  if (!session) {
+    showToast({ message: "Authentication failed. Try again by refreshing this page.", type: "error" });
+    throw new Error("Authentication failed");
+  }
+
   const codeInput = document.getElementById("phone-confirmation-code") as HTMLInputElement;
   const verificationCode = codeInput.value;
 
-  const smsVerifyUrl = getWirexApiUrl("/api/v1/confirmation/sms/verify", authToken.isSandbox);
+  const smsVerifyUrl = getWirexApiUrl("/api/v1/confirmation/sms/verify", session.isSandbox);
   const responseVerify = await fetch(smsVerifyUrl, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
-      Authorization: `Bearer ${authToken.access_token}`,
-      "X-User-Wallet": authToken.wallet,
+      Authorization: `Bearer ${session.access_token}`,
+      "X-User-Wallet": session.wallet,
     },
     body: JSON.stringify({
       code: verificationCode,

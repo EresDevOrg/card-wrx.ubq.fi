@@ -1,14 +1,14 @@
-import { getUserAuthToken2 } from "../../shared/user-auth";
+import { getSession } from "../../shared/user-session";
 import { getWirexApiUrl } from "../../shared/utils";
 import { Card } from "../../shared/wirex-types";
 
 export async function updateActiveBalance(cardId: string, tokenAddress: string): Promise<boolean> {
-  const auth = getUserAuthToken2();
-  if (!auth) {
+  const session = getSession();
+  if (!session) {
     return false;
   }
 
-  const apiUrl = getWirexApiUrl(`/api/v1/cards/${cardId}/balance/active`, auth.isSandbox);
+  const apiUrl = getWirexApiUrl(`/api/v1/cards/${cardId}/balance/active`, session.isSandbox);
 
   try {
     const response = await fetch(apiUrl, {
@@ -16,8 +16,8 @@ export async function updateActiveBalance(cardId: string, tokenAddress: string):
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
-        Authorization: `Bearer ${auth.access_token}`,
-        "X-User-Wallet": auth.wallet,
+        Authorization: `Bearer ${session.access_token}`,
+        "X-User-Wallet": session.wallet,
       },
       body: JSON.stringify({
         balance_token_address: tokenAddress,
@@ -38,19 +38,19 @@ export async function updateActiveBalance(cardId: string, tokenAddress: string):
 }
 
 export async function toggleStatus(card: Card): Promise<boolean> {
-  const auth = getUserAuthToken2();
-  if (!auth) {
+  const session = getSession();
+  if (!session) {
     return false;
   }
 
   const path = card.status === "Blocked" ? `/api/v1/cards/${card.id}/unblock` : `/api/v1/cards/${card.id}/block`;
-  const cardStatusUrl = getWirexApiUrl(path, auth.isSandbox);
+  const cardStatusUrl = getWirexApiUrl(path, session.isSandbox);
   const responseToggleStatus = await fetch(cardStatusUrl, {
     method: "PUT",
     headers: {
       Accept: "application/json",
-      Authorization: `Bearer ${auth.access_token}`,
-      "X-User-Wallet": auth.wallet,
+      Authorization: `Bearer ${session.access_token}`,
+      "X-User-Wallet": session.wallet,
     },
   });
 
@@ -64,12 +64,12 @@ export async function toggleStatus(card: Card): Promise<boolean> {
 }
 
 export async function updateCardLimit(cardId: string, limit: number): Promise<boolean> {
-  const auth = getUserAuthToken2();
-  if (!auth) {
+  const session = getSession();
+  if (!session) {
     return false;
   }
 
-  const apiUrl = getWirexApiUrl(`/api/v1/cards/${cardId}/limit`, auth.isSandbox);
+  const apiUrl = getWirexApiUrl(`/api/v1/cards/${cardId}/limit`, session.isSandbox);
 
   try {
     const response = await fetch(apiUrl, {
@@ -77,8 +77,8 @@ export async function updateCardLimit(cardId: string, limit: number): Promise<bo
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
-        Authorization: `Bearer ${auth.access_token}`,
-        "X-User-Wallet": auth.wallet,
+        Authorization: `Bearer ${session.access_token}`,
+        "X-User-Wallet": session.wallet,
       },
       body: JSON.stringify({
         limit: limit,

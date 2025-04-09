@@ -1,4 +1,4 @@
-import { getUserAuthToken2 } from "../shared/user-auth";
+import { getSession } from "../shared/user-session";
 import { getWirexApiUrl } from "../shared/utils";
 import { showToast } from "./toaster";
 
@@ -75,18 +75,18 @@ export async function loadTransactions() {
     console.error("Transactions table body not found.");
     return;
   }
-  const auth = getUserAuthToken2();
-  if (!auth) {
+  const session = getSession();
+  if (!session) {
     showToast({ message: "Please login to view your transactions.", type: "error" });
     return;
   }
 
   try {
-    const response = await fetch(getWirexApiUrl(`/api/v1/transactions/card?page_number=0&page_size=100`, auth.isSandbox), {
+    const response = await fetch(getWirexApiUrl(`/api/v1/transactions/card?page_number=0&page_size=100`, session.isSandbox), {
       method: "GET",
       headers: {
-        Authorization: `Bearer ${auth.access_token}`,
-        "X-User-Wallet": auth.wallet,
+        Authorization: `Bearer ${session.access_token}`,
+        "X-User-Wallet": session.wallet,
         accept: "application/json",
       },
     });

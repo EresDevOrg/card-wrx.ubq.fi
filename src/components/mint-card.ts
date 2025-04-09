@@ -1,4 +1,4 @@
-import { getUserAuthToken } from "../shared/user-auth";
+import { getSession } from "../shared/user-session";
 import { getWirexApiUrl } from "../shared/utils";
 import { getCardImage } from "./card-svg";
 import { showToast } from "./toaster";
@@ -15,10 +15,14 @@ export function mintCard(): string {
 export function addMintCardEvents() {
   document.getElementById("mint-card")?.addEventListener("click", () => {
     (async () => {
-      const authToken = getUserAuthToken();
+      const session = getSession();
+      if (!session) {
+        showToast({ message: "Connect your wallet.", type: "error" });
+        return;
+      }
 
       try {
-        const user = authToken.user;
+        const user = session.user;
         // Check verification status (assuming the response structure matches the original logic)
         // // Change it to Approved later
         if (user.verification_status !== "Approved") {
@@ -38,30 +42,31 @@ export function addMintCardEvents() {
           return;
         }
 
-        const cardsUrl = `${getWirexApiUrl("/api/v1/cards?page_number=0&page_size=10", authToken.isSandbox)}`;
+        const cardsUrl = `${getWirexApiUrl("/api/v1/cards?page_number=0&page_size=10", session.isSandbox)}`;
         const cardsResponse = await fetch(cardsUrl, {
           method: "GET",
           headers: {
-            Authorization: `Bearer ${authToken.access_token}`,
+            Authorization: `Bearer ${session.access_token}`,
             Accept: "application/json",
-            "X-User-Wallet": authToken.wallet,
+            "X-User-Wallet": session.wallet,
           },
         });
 
         const cards = await cardsResponse.json();
         console.log("cards", cards);
+        // In case we want to limit the number of cards
         // if (cards.data.length > 1) {
         //   showToast({ message: `You already have a card. You cannot mint more for now.`, type: "error" });
         //   return;
         // }
 
-        const mintUrl = `${getWirexApiUrl("/api/v1/cards/virtual", authToken.isSandbox)}`;
+        const mintUrl = `${getWirexApiUrl("/api/v1/cards/virtual", session.isSandbox)}`;
         const cardResponse = await fetch(mintUrl, {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${authToken.access_token}`,
+            Authorization: `Bearer ${session.access_token}`,
             Accept: "application/json",
-            "X-User-Wallet": authToken.wallet,
+            "X-User-Wallet": session.wallet,
           },
         });
 
@@ -70,7 +75,7 @@ export function addMintCardEvents() {
         }
 
         const card = await cardResponse.json();
-        showToast({ message: `Card minted successfully! Card ID: ${card.id}`, type: "success" });
+        showToast({ message: `Card minted successfully! It will be available on the cards page in a few minutes.`, type: "success" });
         console.log("card", card);
       } catch (error) {
         console.error("Error:", error);

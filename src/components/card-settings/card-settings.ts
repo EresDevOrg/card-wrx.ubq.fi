@@ -1,4 +1,4 @@
-import { getUserAuthToken2 } from "../../shared/user-auth";
+import { getSession } from "../../shared/user-session";
 import { formatDate } from "../../shared/utils";
 import { Card } from "../../shared/wirex-types";
 import { showToast } from "../toaster";
@@ -6,10 +6,10 @@ import { toggleStatus, updateActiveBalance, updateCardLimit } from "./non-otp-ac
 import { executeWithOtp, getCardNumbers, getCvvCode } from "./otp-actions";
 
 export function getCardSettingsHtml(cardId: string): string {
-  const auth = getUserAuthToken2();
+  const session = getSession();
   let card: Card | null = null;
-  if (auth) {
-    card = auth.cards?.find((card) => card.id === cardId) ?? null;
+  if (session) {
+    card = session.cards?.find((card) => card.id === cardId) ?? null;
   }
   if (!card) {
     return `<div class="container"><h2>Card not found</h2></div>`;
@@ -90,10 +90,10 @@ export function getCardSettingsHtml(cardId: string): string {
 }
 
 export function addCardSettingsEvents(cardId: string) {
-  const auth = getUserAuthToken2();
+  const session = getSession();
   let card: Card | null = null;
-  if (auth) {
-    card = auth.cards?.find((card) => card.id === cardId) ?? null;
+  if (session) {
+    card = session.cards?.find((card) => card.id === cardId) ?? null;
   }
   if (!card) {
     return;
@@ -178,12 +178,12 @@ export function addCardSettingsEvents(cardId: string) {
 
   cardIdElement.textContent = card.id;
   userNameElement.textContent = card.card_data.name_on_card;
-  if (auth?.user.email) {
-    userEmailElement.textContent = auth.user.email;
+  if (session?.user.email) {
+    userEmailElement.textContent = session.user.email;
   }
 
-  if (auth?.user.phone_number_data.phone_number) {
-    userPhoneElement.textContent = `${auth?.user.phone_number_data.phone_number} (${auth?.user.phone_number_data?.is_confirmed ? "Confirmed" : "Not Confirmed"})`;
+  if (session?.user.phone_number_data.phone_number) {
+    userPhoneElement.textContent = `${session?.user.phone_number_data.phone_number} (${session?.user.phone_number_data?.is_confirmed ? "Confirmed" : "Not Confirmed"})`;
   }
 
   cardLimitElement.textContent = `Daily: ${card.limit.daily_limit ? card.limit.daily_limit : 0} / Used: ${card.limit.daily_usage ? card.limit.daily_usage : 0}`;

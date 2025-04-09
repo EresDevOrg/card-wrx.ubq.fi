@@ -1,4 +1,4 @@
-import { getUserAuthToken2 } from "../shared/user-auth";
+import { getSession } from "../shared/user-session";
 import { showToast } from "./toaster";
 
 export function getCardsHtml(): string {
@@ -18,13 +18,13 @@ export function addCardsEvents() {
     </svg>
 `;
 
-  const auth = getUserAuthToken2();
-  if (!auth) {
-    showToast({ message: "Please login to view your cards.", type: "error" });
+  const session = getSession();
+  if (!session) {
+    showToast({ message: "Connect your wallet to view your cards.", type: "error" });
     return;
   }
 
-  auth.cards?.forEach((card) => {
+  session.cards?.forEach((card) => {
     const cardContainer = document.createElement("div");
     cardContainer.classList.add("card-container");
 

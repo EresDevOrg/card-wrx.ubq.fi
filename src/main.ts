@@ -6,7 +6,7 @@ import { providersUrl } from "./constants";
 import { initializeState } from "./on-load";
 import { handleRouting } from "./router";
 import { useRpcHandler } from "./shared/use-rpc-handler";
-import { authenticateUser, clearUserAuthToken } from "./shared/user-auth";
+import { authenticate, clearSession } from "./shared/user-session";
 import { wirexPayChain, wirexPayChainTestnet } from "./shared/wirex-pay-chain";
 
 const projectId = "415760038f8e330de4868120be3205b8";
@@ -72,7 +72,7 @@ export async function initializeProviderAndSigner() {
     const userAddress = await userSigner.getAddress();
     console.log("User address:", userAddress);
 
-    await authenticateUser(userAddress);
+    await authenticate(userAddress);
   } else {
     userSigner = undefined;
   }
@@ -98,7 +98,7 @@ export function handleNetworkSwitch() {
 
   appState.subscribeEvents((event: EventsControllerState) => {
     if (event.data.event == "DISCONNECT_SUCCESS") {
-      clearUserAuthToken();
+      clearSession();
       window.location.reload();
     }
   });
@@ -106,7 +106,7 @@ export function handleNetworkSwitch() {
 
 export async function mainModule() {
   try {
-    clearUserAuthToken();
+    clearSession();
     await initializeProviderAndSigner();
     console.log("Provider:", provider);
     handleNetworkSwitch();

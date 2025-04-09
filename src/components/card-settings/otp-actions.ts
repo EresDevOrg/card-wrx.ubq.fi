@@ -1,11 +1,11 @@
-import { getUserAuthToken2 } from "../../shared/user-auth";
-import { UserAuthToken } from "../../shared/types";
+import { getSession } from "../../shared/user-session";
+import { Session } from "../../shared/types";
 import { getWirexApiUrl, sendOtpForAction, verifyOtp } from "../../shared/utils";
 import { Card } from "../../shared/wirex-types";
 import { showPopup } from "../popup";
 import { showToast } from "../toaster";
 
-export async function getCardNumbers(cardId: string, actionToken: string, auth: UserAuthToken) {
+export async function getCardNumbers(cardId: string, actionToken: string, auth: Session) {
   const response = await fetch(getWirexApiUrl(`/api/v1/cards/${cardId}/details`, auth.isSandbox), {
     method: "POST",
     headers: {
@@ -35,15 +35,15 @@ export async function getCardNumbers(cardId: string, actionToken: string, auth: 
 }
 
 export async function executeWithOtp(
-  callback: (cardId: string, actionToken: string, auth: UserAuthToken) => Promise<string | null>,
+  callback: (cardId: string, actionToken: string, auth: Session) => Promise<string | null>,
   element: HTMLElement,
   card: Card
 ) {
-  const auth = getUserAuthToken2();
-  if (!auth) {
+  const session = getSession();
+  if (!session) {
     return false;
   }
-  const smsSendData = await sendOtpForAction(auth, "GetCardDetails");
+  const smsSendData = await sendOtpForAction(session, "GetCardDetails");
   if (smsSendData) {
     await showPopup({
       title: "Confirm OTP",
@@ -51,13 +51,13 @@ export async function executeWithOtp(
       shouldShowCancelButton: true,
       onConfirm: async (otp) => {
         if (otp) {
-          const smsVerifyData: { token: string } = await verifyOtp(otp, auth, smsSendData);
+          const smsVerifyData: { token: string } = await verifyOtp(otp, session, smsSendData);
           if (!smsVerifyData) {
             showToast({ message: "Failed to verify OTP.", type: "error" });
             return;
           }
 
-          const text = await callback(card.id, smsVerifyData.token, auth);
+          const text = await callback(card.id, smsVerifyData.token, session);
 
           if (text) {
             element.textContent = text;
@@ -70,7 +70,7 @@ export async function executeWithOtp(
   }
 }
 
-export async function getCvvCode(cardId: string, actionToken: string, auth: UserAuthToken) {
+export async function getCvvCode(cardId: string, actionToken: string, auth: Session) {
   const response = await fetch(getWirexApiUrl(`/api/v1/cards/${cardId}/cvv`, auth.isSandbox), {
     method: "POST",
     headers: {

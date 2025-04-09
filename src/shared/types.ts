@@ -5,7 +5,7 @@ export interface GlobalState {
   data: Record<string, unknown>;
 }
 
-export interface UserAuthToken {
+export interface Session {
   isSandbox: boolean;
   access_token: string;
   expires_at: number;

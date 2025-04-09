@@ -1,5 +1,5 @@
 import { appState } from "../../main";
-import { authenticateUser, getUserAuthToken, getUserAuthToken2 } from "../../shared/user-auth";
+import { authenticate, getSession } from "../../shared/user-session";
 import { showToast } from "../toaster";
 import { getSupportedCountriesHtml } from "./countries-dropdown";
 import { getKycLink } from "./kyc";
@@ -150,10 +150,14 @@ export function addRegisterEvents() {
 
     const wallet = appState.getAddress();
     if (wallet) {
-      authenticateUser(wallet)
+      authenticate(wallet)
         .then(() => {
-          const auth = getUserAuthToken();
-          if (auth.user.verification_status !== "Approved") {
+          const session = getSession();
+          if (!session) {
+            showToast({ message: "Authentication failed. Try again by refreshing this page.", type: "error" });
+            return;
+          }
+          if (session.user.verification_status !== "Approved") {
             showToast({ message: "Please complete KYC before next step.", type: "error" });
             return;
           }
@@ -189,7 +193,7 @@ export function addRegisterEvents() {
             //updateStep3Ui();
             const wallet = appState.getAddress();
             if (wallet) {
-              await authenticateUser(wallet);
+              await authenticate(wallet);
             }
           } else {
             showToast({ message: "Invalid verification code. ", type: "error" });
@@ -232,11 +236,11 @@ export function updateStep3Ui() {
 }
 
 function restoreLastRegisterAttempt() {
-  const auth = getUserAuthToken2();
+  const session = getSession();
 
-  if (auth?.user.residence_address.country) {
+  if (session?.user.residence_address.country) {
     const countryDropdown = document.getElementById("country-dropdown") as HTMLSelectElement;
-    const country = auth.user.residence_address.country;
+    const country = session.user.residence_address.country;
     const option = Array.from(countryDropdown.options).find((opt) => {
       return opt.value === country;
     });
@@ -247,9 +251,9 @@ function restoreLastRegisterAttempt() {
     }
   }
 
-  if (auth?.user.email) {
+  if (session?.user.email) {
     const emailInput = document.getElementById("email") as HTMLInputElement;
-    emailInput.value = auth.user.email;
+    emailInput.value = session.user.email;
     emailInput.disabled = true;
   }
 }

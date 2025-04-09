@@ -1,11 +1,11 @@
 import { ethers } from "ethers";
 import { backendBaseUrl } from "../../constants";
 import { showToast } from "../toaster";
-import { getUserAuthToken2 } from "../../shared/user-auth";
+import { getSession } from "../../shared/user-session";
 
 export async function registerOnApp() {
-  const auth = getUserAuthToken2();
-  if (auth?.user.email) {
+  const session = getSession();
+  if (session?.user.email) {
     return true; // already registered
   }
 
