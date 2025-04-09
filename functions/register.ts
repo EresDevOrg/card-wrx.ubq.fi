@@ -1,10 +1,11 @@
 import { getAccessToken } from "./shared";
+import { Context } from "./types";
 
-export async function onRequest(ctx): Promise<Response> {
+export async function onRequest(ctx: Context): Promise<Response> {
   try {
     validateRequestMethod(ctx.request.method, "POST");
     const accessToken = await getAccessToken(ctx.env);
-    const result = await ctx.request.json();
+    const result: { wallet_address: string; email: string; country: string } = await ctx.request.json();
     // if (!result.success) {
     //   throw new Error(`Invalid post parameters: ${JSON.stringify(result)}`);
     // }
