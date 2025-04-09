@@ -4,6 +4,7 @@
     "": {
       "name": "ts-template",
       "dependencies": {
+        "@cloudflare/workers-types": "^4.20250409.0",
         "@reown/appkit": "^1.7.0",
         "@reown/appkit-adapter-ethers5": "^1.7.0",
         "@ubiquity-dao/rpc-handler": "^1.4.0",
@@ -312,6 +313,8 @@
     "@cloudflare/workerd-linux-arm64": ["@cloudflare/workerd-linux-arm64@1.20250310.0", "", { "os": "linux", "cpu": "arm64" }, "sha512-FzWeKM6id20EMZACaDg0Kkvg1C4lvXZgLBXVI6h6xaXTNFReoyEp4v4eMrRTuja5ec5k+m5iGKjP4/bMWJp9ew=="],
 
     "@cloudflare/workerd-windows-64": ["@cloudflare/workerd-windows-64@1.20250310.0", "", { "os": "win32", "cpu": "x64" }, "sha512-04OgaDzm8/8nkjF3tovB+WywZLjSdAHCQT2omXKCwH3EDd1kpd8vvzE1pErtdIyKCOf9/sArY4BhPdxRj7ijlg=="],
+
+    "@cloudflare/workers-types": ["@cloudflare/workers-types@4.20250409.0", "", {}, "sha512-yPxxwE5nr168huEfLNOB6904OsvIWcq0tWT23NMD6jT5SIp2ds3oOGANw7wz39r5y3jZYC2h1OnGwnZXJDDCOg=="],
 
     "@coinbase/wallet-sdk": ["@coinbase/wallet-sdk@4.3.0", "", { "dependencies": { "@noble/hashes": "^1.4.0", "clsx": "^1.2.1", "eventemitter3": "^5.0.1", "preact": "^10.24.2" } }, "sha512-T3+SNmiCw4HzDm4we9wCHCxlP0pqCiwKe4sOwPH3YAK2KSKjxPRydKu6UQJrdONFVLG7ujXvbd/6ZqmvJb8rkw=="],
 
