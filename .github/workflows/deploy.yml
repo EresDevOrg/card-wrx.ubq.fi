@@ -17,25 +17,12 @@ jobs:
         with:
           repository: ${{ github.repository }}
           production_branch: ${{ github.event.repository.default_branch }}
-          build_artifact_name: "full-stack-app"
-          output_directory: "full-stack-app"
+          build_artifact_name: "static"
+          output_directory: "static"
           current_branch: ${{ github.event.workflow_run.head_branch }}
           cloudflare_account_id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           commit_sha: ${{ github.event.workflow_run.head_sha }}
           workflow_run_id: ${{ github.event.workflow_run.id }}
-          statics_directory: "static"
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Make env sync script executable
-        run: chmod +x .github/sync-env-vars.sh
-
-      - name: Run env sync script script
-        env:
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          WIREX_CLIENT_ID: ${{ secrets.WIREX_CLIENT_ID }}
-          WIREX_CLIENT_SECRET: ${{ secrets.WIREX_CLIENT_SECRET }}
-        run: bash .github/sync-env-vars.sh
+          app_id: ${{ secrets.APP_ID }}
+          app_private_key: ${{ secrets.APP_PRIVATE_KEY }}
