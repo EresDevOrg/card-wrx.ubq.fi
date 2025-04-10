@@ -1,8 +1,13 @@
 import { backendBaseUrl } from "../constants";
 import { Session } from "./types";
-import { getWirexApiUrl } from "./utils";
+import { getWirexApiUrl, sign } from "./utils";
 
 export async function authenticate(wallet: string): Promise<void> {
+  const signature = await sign(`Authentication request for ${wallet}`);
+  if (!signature) {
+    return;
+  }
+
   const responseAuth = await fetch(`${backendBaseUrl}/user-auth`, {
     method: "POST",
     headers: {
@@ -11,6 +16,7 @@ export async function authenticate(wallet: string): Promise<void> {
     },
     body: JSON.stringify({
       wallet: wallet,
+      signature: signature,
     }),
   });
 

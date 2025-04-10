@@ -1,4 +1,3 @@
-import { ethers } from "ethers";
 import { WIREX_API_URL_PRODUCTION, WIREX_API_URL_SANDBOX } from "../../functions/shared";
 import { SmsResponse } from "../components/register/phone-register";
 import { showToast } from "../components/toaster";
@@ -20,10 +19,6 @@ export async function sign(message: string): Promise<string> {
     console.error("Error signing message:", error);
     throw new Error(`Failed to sign message: ${error}`);
   }
-}
-
-export async function verify(message: string, signature: string, wallet: string): Promise<boolean> {
-  return ethers.utils.verifyMessage(message, signature) == wallet;
 }
 
 export function getWirexApiUrl(path: string, sandbox: boolean): string {

@@ -1,13 +1,25 @@
+import { ethers } from "ethers";
 import { getAccessToken } from "./shared";
 import { Context } from "./types";
 
 export async function onRequestPost(ctx: Context): Promise<Response> {
   try {
-    const accessToken = await getAccessToken(ctx.env);
-    const result: { wallet: string } = await ctx.request.json();
+    const result: { wallet: string; signature: string } = await ctx.request.json();
 
     console.log("result", result);
-    const { wallet } = result;
+    const { wallet, signature } = result;
+
+    if (!wallet || !signature) {
+      return Response.json({ message: "Missing wallet or signature" }, { status: 400 });
+    }
+
+    const isSigValid = ethers.utils.verifyMessage(`Authentication request for ${wallet}`, signature) == wallet;
+
+    if (!isSigValid) {
+      return Response.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    const accessToken = await getAccessToken(ctx.env);
 
     // API endpoint from WirexPayChain partner documentation
     console.log("Is sandbox: ", accessToken.isSandbox);
