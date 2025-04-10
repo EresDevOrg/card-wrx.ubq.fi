@@ -44,6 +44,10 @@ interface TransactionResponse {
 }
 
 export function getTransactionsHtml(): string {
+  const session = getSession();
+  if (!session?.cards?.length) {
+    return `<div class="container">Transaction history not found.</div>`;
+  }
   return `<div class="transactions-container">
             <h2>Transaction History</h2>
             <div class="table-responsive">
