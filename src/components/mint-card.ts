@@ -18,7 +18,7 @@ export function addMintCardEvents() {
     (async () => {
       const session = getSession();
       if (!session) {
-        showToast({ message: "Connect your wallet.", type: "error" });
+        showToast({ message: "You must register before you can mint a card.", type: "error" });
         return;
       }
 
