@@ -48,8 +48,8 @@ export function addCardsEvents() {
             </ul>
         </p>
         <p><strong>Limit:</strong> Daily: <span class="daily-limit">${card.limit.daily_limit ? card.limit.daily_limit : 0}</span> / Used: <span class="daily-usage">${card.limit.daily_usage ? card.limit.daily_usage : 0}</span></p>
-        <p><strong>Created At:</strong> <span class="created-at">${new Date(card.created_at).toLocaleDateString()} ${new Date(card.created_at).toLocaleTimeString()}</span></p>
-        <p><strong>Updated At:</strong> <span class="updated-at">${card.updated_at ? `${new Date(card.updated_at).toLocaleDateString()} ${new Date(card.updated_at).toLocaleTimeString()}` : "N/A"}</span></p>
+        <p><strong>Created At:</strong> <span class="created-at">${card.created_at}</span></p>
+        <p><strong>Updated At:</strong> <span class="updated-at">${card.updated_at ? `${card.updated_at}` : "N/A"}</span></p>
         <p><strong>ID:</strong> <span class="card-id">${card.id}</span></p>
         
     `;

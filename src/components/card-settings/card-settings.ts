@@ -1,5 +1,4 @@
 import { getSession } from "../../shared/user-session";
-import { formatDate } from "../../shared/utils";
 import { Card } from "../../shared/wirex-types";
 import { showToast } from "../toaster";
 import { toggleStatus, updateActiveBalance, updateCardLimit } from "./non-otp-actions";
@@ -206,8 +205,8 @@ export function addCardSettingsEvents() {
   }
 
   cardLimitElement.textContent = `Daily: ${card.limit.daily_limit ? card.limit.daily_limit : 0} / Used: ${card.limit.daily_usage ? card.limit.daily_usage : 0}`;
-  createdAtElement.textContent = formatDate(card.created_at);
-  updatedAtElement.textContent = card.updated_at ? formatDate(card.updated_at) : "N/A";
+  createdAtElement.textContent = card.created_at;
+  updatedAtElement.textContent = card.updated_at ? card.updated_at : "N/A";
   const activeBalance = card.balances.find((b) => b.is_active);
   activeBalanceElement.textContent = activeBalance ? `${activeBalance.balance} ${activeBalance.token_symbol}` : "N/A";
   statusText.textContent = card.status;
