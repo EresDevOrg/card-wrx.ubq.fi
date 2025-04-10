@@ -1,10 +1,18 @@
+import { showToast } from "../components/toaster";
 import { backendBaseUrl } from "../constants";
 import { Session } from "./types";
 import { getWirexApiUrl, sign } from "./utils";
 
 export async function authenticate(wallet: string): Promise<void> {
-  const signature = await sign(`Authentication request for ${wallet.toLowerCase()}`);
-  if (!signature) {
+  let signature;
+  try {
+    signature = await sign(`Authentication request for ${wallet.toLowerCase()}`);
+  } catch (e) {
+    showToast({
+      message: "Signature is required to use the app.",
+      type: "error",
+    });
+    console.error("Error signing message: ", e);
     return;
   }
 
