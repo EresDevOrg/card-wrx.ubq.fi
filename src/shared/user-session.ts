@@ -3,7 +3,7 @@ import { Session } from "./types";
 import { getWirexApiUrl, sign } from "./utils";
 
 export async function authenticate(wallet: string): Promise<void> {
-  const signature = await sign(`Authentication request for ${wallet}`);
+  const signature = await sign(`Authentication request for ${wallet.toLowerCase()}`);
   if (!signature) {
     return;
   }

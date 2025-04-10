@@ -20,7 +20,11 @@ export function addCardsEvents() {
 
   const session = getSession();
   if (!session) {
-    showToast({ message: "Connect your wallet to view your cards.", type: "error" });
+    showToast({ message: "Register to get your card.", type: "error" });
+    return;
+  }
+  if (session && session.cards?.length === 0) {
+    showToast({ message: "You have no cards.", type: "error" });
     return;
   }
 

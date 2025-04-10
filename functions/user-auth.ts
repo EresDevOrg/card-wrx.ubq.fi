@@ -13,7 +13,7 @@ export async function onRequestPost(ctx: Context): Promise<Response> {
       return Response.json({ message: "Missing wallet or signature" }, { status: 400 });
     }
 
-    const isSigValid = ethers.utils.verifyMessage(`Authentication request for ${wallet}`, signature) == wallet;
+    const isSigValid = ethers.utils.verifyMessage(`Authentication request for ${wallet.toLowerCase()}`, signature) == wallet;
 
     if (!isSigValid) {
       return Response.json({ message: "Unauthorized" }, { status: 401 });
