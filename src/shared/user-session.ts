@@ -7,16 +7,20 @@ export async function authenticate(wallet: string): Promise<void> {
   const session = getSession();
   const hasTokenExpired = session?.expires_at && new Date(session.expires_at * 1000) < new Date();
   if (!session || hasTokenExpired) {
-    let signature;
-    try {
-      signature = await sign(`Authentication request for ${wallet.toLowerCase()}`);
-    } catch (e) {
-      showToast({
-        message: "Signature is required to use the app.",
-        type: "error",
-      });
-      console.error("Error signing message: ", e);
-      return;
+    const signature = localStorage.getItem("user-signature");
+    if (!signature) {
+      let signature;
+      try {
+        signature = await sign(`Authentication request for ${wallet.toLowerCase()}`);
+        localStorage.setItem("user-signature", signature);
+      } catch (e) {
+        showToast({
+          message: "Signature is required to use the app.",
+          type: "error",
+        });
+        console.error("Error signing message: ", e);
+        return;
+      }
     }
 
     const responseAuth = await fetch(`${backendBaseUrl}/user-auth`, {
@@ -67,4 +71,5 @@ export function getSession(): Session | null {
 
 export function clearSession() {
   localStorage.removeItem("session");
+  localStorage.removeItem("user-signature");
 }
