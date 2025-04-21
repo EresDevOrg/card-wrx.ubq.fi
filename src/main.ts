@@ -105,7 +105,6 @@ export function handleNetworkSwitch() {
 
 export async function mainModule() {
   try {
-    clearSession();
     await initializeProviderAndSigner();
     console.log("Provider:", provider);
     handleNetworkSwitch();
