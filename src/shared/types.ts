@@ -8,6 +8,9 @@ export interface GlobalState {
 export interface Session {
   isSandbox: boolean;
   access_token: string;
+  /**
+   * The time when the access token expires, in epoch seconds.
+   */
   expires_at: number;
   wallet: string;
   user: User;
