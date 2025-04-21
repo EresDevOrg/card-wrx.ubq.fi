@@ -90,11 +90,6 @@ export function handleNetworkSwitch() {
     }
   });
 
-  // wallet connection listener
-  appState.subscribeWalletInfo(() => {
-    initializeProviderAndSigner().catch(console.error);
-  });
-
   appState.subscribeEvents((event: EventsControllerState) => {
     if (event.data.event == "DISCONNECT_SUCCESS") {
       clearSession();
