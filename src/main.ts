@@ -72,6 +72,16 @@ export async function initializeProviderAndSigner() {
     console.log("User address:", userAddress);
 
     await authenticate(userAddress);
+
+    (ethereum as { on: (e: string, f: () => void) => void }).on("accountsChanged", () => {
+      clearSession();
+      window.location.reload();
+    });
+
+    (ethereum as { on: (e: string, f: () => void) => void }).on("networkChanged", () => {
+      clearSession();
+      window.location.reload();
+    });
   } else {
     userSigner = undefined;
   }
