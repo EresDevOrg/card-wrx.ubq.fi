@@ -5,7 +5,8 @@ import { getWirexApiUrl, sign } from "./utils";
 
 export async function authenticate(wallet: string): Promise<void> {
   const session = getSession();
-  if (session) {
+  const hasTokenExpired = session?.expires_at && new Date(session.expires_at * 1000) < new Date();
+  if (!session || hasTokenExpired) {
     let signature;
     try {
       signature = await sign(`Authentication request for ${wallet.toLowerCase()}`);
