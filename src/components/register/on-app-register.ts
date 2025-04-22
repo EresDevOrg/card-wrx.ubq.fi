@@ -2,6 +2,7 @@ import { ethers } from "ethers";
 import { backendBaseUrl } from "../../constants";
 import { showToast } from "../toaster";
 import { getSession } from "../../shared/user-session";
+import { sign } from "../../shared/utils";
 
 export async function registerOnApp() {
   const session = getSession();
@@ -22,9 +23,20 @@ export async function registerOnApp() {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
     const userAddress = await signer.getAddress();
+    let signature;
+    try {
+      signature = await sign(`Authentication request for ${userAddress.toLowerCase()}`);
+    } catch (e) {
+      showToast({
+        message: "Signature is required to register.",
+        type: "error",
+      });
+      console.error("Error signing message: ", e);
+      return false;
+    }
 
     // Register user with API
-    const isSuccess = await registerUserWithApi(email, userAddress);
+    const isSuccess = await registerUserWithApi(email, userAddress, signature);
 
     return isSuccess;
   } else {
@@ -32,7 +44,7 @@ export async function registerOnApp() {
   }
 }
 
-async function registerUserWithApi(email: string, userAddress: string): Promise<boolean> {
+async function registerUserWithApi(email: string, userAddress: string, signature: string): Promise<boolean> {
   try {
     const response = await fetch(`${backendBaseUrl}/register`, {
       method: "POST",
@@ -43,6 +55,7 @@ async function registerUserWithApi(email: string, userAddress: string): Promise<
       body: JSON.stringify({
         email: email,
         wallet_address: userAddress,
+        signature: signature,
         country: "DE", // Add any other required fields based on the API documentation
         // Add any other required fields based on the API documentation
       }),
