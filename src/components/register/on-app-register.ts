@@ -23,11 +23,6 @@ export async function registerOnApp() {
     const signer = provider.getSigner();
     const userAddress = await signer.getAddress();
 
-    // Get sandbox status
-    const backendBaseUrl = "";
-    const authUrl = `${backendBaseUrl}/auth`;
-    await fetch(authUrl, { method: "GET" });
-
     // Register user with API
     const isSuccess = await registerUserWithApi(email, userAddress);
 
