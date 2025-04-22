@@ -1,16 +1,31 @@
-import { backendBaseUrl } from "../../constants";
 import { appState } from "../../main";
+import { getSession } from "../../shared/user-session";
+import { getWirexApiUrl } from "../../shared/utils";
+import { showToast } from "../toaster";
 
 export async function getKycLink(): Promise<void> {
-  const response = await fetch(`${backendBaseUrl}/kyc-link`, {
+  const session = getSession();
+  if (!session?.access_token) {
+    showToast({ message: "Authentication failed. Try again by refreshing this page.", type: "error" });
+    return;
+  }
+
+  const wallet = appState.getAddress();
+  if (!wallet) {
+    showToast({ message: "Couldn't detect your wallet address. Please connect your wallet.", type: "error" });
+    return;
+  }
+
+  const kycLinkUrl = getWirexApiUrl("/api/v1/user/verification-link", session.isSandbox);
+
+  const response = await fetch(kycLinkUrl, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
+      Authorization: `Bearer ${session.access_token}`,
+      "X-User-Wallet": wallet,
     },
-    body: JSON.stringify({
-      wallet: appState.getAddress(),
-    }),
   });
 
   const data = await response.json();
