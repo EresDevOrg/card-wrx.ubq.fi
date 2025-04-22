@@ -35,8 +35,16 @@ export async function registerOnApp() {
       return false;
     }
 
+    // read country from select dropdown with id country-dropdown
+    const countryDropdown = document.getElementById("country-dropdown") as HTMLSelectElement;
+    const country = countryDropdown.value;
+    if (!country) {
+      showToast({ message: "We couldn't detect your country. Try to restart the register process.", type: "error" });
+      return false;
+    }
+
     // Register user with API
-    const isSuccess = await registerUserWithApi(email, userAddress, signature);
+    const isSuccess = await registerUserWithApi(email, userAddress, country, signature);
 
     return isSuccess;
   } else {
@@ -44,7 +52,7 @@ export async function registerOnApp() {
   }
 }
 
-async function registerUserWithApi(email: string, userAddress: string, signature: string): Promise<boolean> {
+async function registerUserWithApi(email: string, userAddress: string, country: string, signature: string): Promise<boolean> {
   try {
     const response = await fetch(`${backendBaseUrl}/register`, {
       method: "POST",
@@ -56,8 +64,7 @@ async function registerUserWithApi(email: string, userAddress: string, signature
         email: email,
         wallet_address: userAddress,
         signature: signature,
-        country: "DE", // Add any other required fields based on the API documentation
-        // Add any other required fields based on the API documentation
+        country: country,
       }),
     });
 
