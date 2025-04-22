@@ -136,8 +136,6 @@ export function addRegisterEvents() {
         success = await registerOnApp();
         if (success) {
           updateStep2Ui();
-        } else {
-          showToast({ message: "Error registering with API.", type: "error" });
         }
       } catch (error) {
         console.error(error);
