@@ -3,14 +3,13 @@ import { backendBaseUrl } from "../../constants";
 import { appState } from "../../main";
 import { wirexPayChain, wirexPayChainTestnet } from "../../shared/wirex-pay-chain";
 import { showToast } from "../toaster";
-import { AccessToken } from "../../../functions/types";
 
 export async function registerOnChain(button: HTMLButtonElement) {
   try {
-    const authData = await authenticateUser();
-    if (!authData) throw new Error("Error authenticating.");
+    const envData = await getEnv();
+    if (!envData) throw new Error("Error getting env.");
 
-    const wirexRegisterContract = await setupNetworkAndContract(authData);
+    const wirexRegisterContract = await setupNetworkAndContract(envData.isSandbox);
 
     if (!window.ethereum) {
       alert("Please install a Web3 wallet like MetaMask to continue.");
@@ -31,21 +30,20 @@ export async function registerOnChain(button: HTMLButtonElement) {
   }
 }
 
-async function authenticateUser() {
-  const authUrl = `${backendBaseUrl}/auth`;
-  const authResponse = await fetch(authUrl, { method: "GET" });
-  const responseJson = await authResponse.json();
+async function getEnv() {
+  const authUrl = `${backendBaseUrl}/get-env`;
+  const envResponse = await fetch(authUrl, { method: "GET" });
+  const responseJson: { isSandbox: boolean } = await envResponse.json();
 
-  if (authResponse.status !== 200) {
-    showToast({ message: "Error authenticating.", type: "error" });
-    console.error("Error authenticating: ", responseJson);
+  if (envResponse.status !== 200) {
+    showToast({ message: "Error getting env.", type: "error" });
+    console.error("Error getting env: ", responseJson);
     return null;
   }
   return responseJson;
 }
 
-async function setupNetworkAndContract(responseJson: AccessToken) {
-  const isSandbox = responseJson.isSandbox;
+async function setupNetworkAndContract(isSandbox: boolean) {
   await appState.switchNetwork(isSandbox ? wirexPayChainTestnet : wirexPayChain);
 
   return isSandbox ? "0x062AfB76614dd594A99e70fD2CfbDf417CCF8797" : "0x2766F66E572C94a4cbc57f4d5bd2aD71900edF30";
