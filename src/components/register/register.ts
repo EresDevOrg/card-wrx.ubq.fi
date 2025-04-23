@@ -1,11 +1,12 @@
 import { appState } from "../../main";
 import { authenticate, getSession } from "../../shared/user-session";
+import { verifyOtp } from "../../shared/utils";
 import { showToast } from "../toaster";
 import { getSupportedCountriesHtml } from "./countries-dropdown";
 import { getKycLink } from "./kyc";
 import { registerOnApp } from "./on-app-register";
 import { registerOnChain } from "./on-chain-register";
-import { registerPhone, SmsResponse, verifyPhone } from "./phone-register";
+import { registerPhone, SmsResponse } from "./phone-register";
 
 // Step states
 export enum RegistrationStep {
@@ -169,6 +170,12 @@ export function addRegisterEvents() {
   document.getElementById("phone-registration-form")?.addEventListener("submit", (event) => {
     event.preventDefault();
 
+    const session = getSession();
+    if (!session) {
+      showToast({ message: "Authentication failed. Try again by refreshing this page.", type: "error" });
+      return;
+    }
+
     const phoneNo = document.getElementById("phone") as HTMLInputElement;
     if (!phoneNo) {
       showToast({ message: `Phone number is required.`, type: "error" });
@@ -185,8 +192,12 @@ export function addRegisterEvents() {
     (async () => {
       try {
         if (smsResponse) {
-          const isSuccess = await verifyPhone(smsResponse);
-          if (isSuccess) {
+          const codeInput = document.getElementById("phone-confirmation-code") as HTMLInputElement;
+          const verificationCode = codeInput.value;
+
+          const smsVerifyData = await verifyOtp(verificationCode, session, smsResponse).catch(console.error);
+
+          if (smsVerifyData) {
             showToast({ message: "Your phone number has been verified. Your registration is complete.", type: "success" });
             const step4 = document.getElementById("step-4");
             if (step4) step4.style.display = "none";
@@ -200,7 +211,6 @@ export function addRegisterEvents() {
         } else {
           smsResponse = await registerPhone(phoneNo.value);
           showToast({ message: "An SMS has been sent to you.", type: "success" });
-          //updateStep3Ui();
         }
       } catch (error) {
         console.error(error);

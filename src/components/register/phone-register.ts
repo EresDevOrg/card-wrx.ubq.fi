@@ -1,5 +1,6 @@
 import { createWirexApiUrl } from "../../../functions/shared";
 import { getSession } from "../../shared/user-session";
+import { sendOtpForAction } from "../../shared/utils";
 import { showToast } from "../toaster";
 
 export interface SmsResponse {
@@ -36,66 +37,10 @@ export async function registerPhone(phone: string): Promise<SmsResponse> {
     throw new Error(`Error updating phone number: ${JSON.stringify(errorData)}`);
   }
 
-  console.log("Phone confirmation code sent successfully");
-
-  const smsUrl = createWirexApiUrl("api/v1/confirmation/sms", session.isSandbox);
-  const responseSms = await fetch(smsUrl, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${session.access_token}`,
-      "X-User-Wallet": session.wallet,
-    },
-    body: JSON.stringify({
-      action_type: "ConfirmPhone",
-    }),
-  });
-
-  if (!responseSms.ok) {
-    const errorData = await responseSms.json();
-    showToast({ message: "Error sending confirmation sms. ", type: "error" });
-    throw new Error(`Error sending confirmation sms ${JSON.stringify(errorData)}`);
+  const smsSendData = await sendOtpForAction(session, "ConfirmPhone");
+  if (!smsSendData) {
+    throw new Error("Error sending OTP SMS");
   }
 
-  const smsSendData = await responseSms.json();
-  console.log("Phone confirmation code sent successfully:", smsSendData);
   return smsSendData;
-}
-
-export async function verifyPhone(smsResponse: SmsResponse) {
-  const session = getSession();
-  if (!session) {
-    showToast({ message: "Authentication failed. Try again by refreshing this page.", type: "error" });
-    throw new Error("Authentication failed");
-  }
-
-  const codeInput = document.getElementById("phone-confirmation-code") as HTMLInputElement;
-  const verificationCode = codeInput.value;
-
-  const smsVerifyUrl = createWirexApiUrl("api/v1/confirmation/sms/verify", session.isSandbox);
-  const responseVerify = await fetch(smsVerifyUrl, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${session.access_token}`,
-      "X-User-Wallet": session.wallet,
-    },
-    body: JSON.stringify({
-      code: verificationCode,
-      session_id: smsResponse.session_id,
-    }),
-  });
-
-  if (!responseVerify.ok) {
-    const errorData = await responseVerify.json();
-    console.error("Error verifying code", JSON.stringify(errorData));
-    return false;
-  }
-
-  const smsVerifyData = await responseVerify.json();
-  console.log("Phone number verified successfully:", smsVerifyData);
-
-  return true;
 }
