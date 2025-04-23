@@ -1,6 +1,6 @@
+import { createWirexApiUrl } from "../../../functions/shared";
 import { appState } from "../../main";
 import { getSession } from "../../shared/user-session";
-import { getWirexApiUrl } from "../../shared/utils";
 import { showToast } from "../toaster";
 
 export async function getKycLink(): Promise<void> {
@@ -16,7 +16,7 @@ export async function getKycLink(): Promise<void> {
     return;
   }
 
-  const kycLinkUrl = getWirexApiUrl("/api/v1/user/verification-link", session.isSandbox);
+  const kycLinkUrl = createWirexApiUrl("api/v1/user/verification-link", session.isSandbox);
 
   const response = await fetch(kycLinkUrl, {
     method: "POST",

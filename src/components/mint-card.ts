@@ -1,8 +1,8 @@
 import { getSession } from "../shared/user-session";
-import { getWirexApiUrl } from "../shared/utils";
 import { getCardImage } from "./card-svg";
 import { showToast } from "./toaster";
 import { showPopup } from "./popup";
+import { createWirexApiUrl } from "../../functions/shared";
 
 export function mintCard(): string {
   return `
@@ -56,7 +56,7 @@ export function addMintCardEvents() {
           return;
         }
 
-        const cardsUrl = `${getWirexApiUrl("/api/v1/cards?page_number=0&page_size=10", session.isSandbox)}`;
+        const cardsUrl = `${createWirexApiUrl("api/v1/cards?page_number=0&page_size=10", session.isSandbox)}`;
         const cardsResponse = await fetch(cardsUrl, {
           method: "GET",
           headers: {
@@ -74,7 +74,7 @@ export function addMintCardEvents() {
         //   return;
         // }
 
-        const mintUrl = `${getWirexApiUrl("/api/v1/cards/virtual", session.isSandbox)}`;
+        const mintUrl = `${createWirexApiUrl("api/v1/cards/virtual", session.isSandbox)}`;
         const cardResponse = await fetch(mintUrl, {
           method: "POST",
           headers: {

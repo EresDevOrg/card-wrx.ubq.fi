@@ -48,3 +48,11 @@ export function getWirexApiAbsoluteUrl(path: string, env: Env): string {
 
   return `${WIREX_API_URL_PRODUCTION}/${path}`;
 }
+
+export function createWirexApiUrl(path: string, useSandbox: boolean): string {
+  if (useSandbox) {
+    return `${WIREX_API_URL_SANDBOX}/${path}`;
+  }
+
+  return `${WIREX_API_URL_PRODUCTION}/${path}`;
+}

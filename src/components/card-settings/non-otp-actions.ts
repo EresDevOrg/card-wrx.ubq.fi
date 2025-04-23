@@ -1,5 +1,5 @@
+import { createWirexApiUrl } from "../../../functions/shared";
 import { getSession } from "../../shared/user-session";
-import { getWirexApiUrl } from "../../shared/utils";
 import { Card } from "../../shared/wirex-types";
 
 export async function updateActiveBalance(cardId: string, tokenAddress: string): Promise<boolean> {
@@ -8,7 +8,7 @@ export async function updateActiveBalance(cardId: string, tokenAddress: string):
     return false;
   }
 
-  const apiUrl = getWirexApiUrl(`/api/v1/cards/${cardId}/balance/active`, session.isSandbox);
+  const apiUrl = createWirexApiUrl(`api/v1/cards/${cardId}/balance/active`, session.isSandbox);
 
   try {
     const response = await fetch(apiUrl, {
@@ -43,8 +43,8 @@ export async function toggleStatus(card: Card): Promise<boolean> {
     return false;
   }
 
-  const path = card.status === "Blocked" ? `/api/v1/cards/${card.id}/unblock` : `/api/v1/cards/${card.id}/block`;
-  const cardStatusUrl = getWirexApiUrl(path, session.isSandbox);
+  const path = card.status === "Blocked" ? `api/v1/cards/${card.id}/unblock` : `api/v1/cards/${card.id}/block`;
+  const cardStatusUrl = createWirexApiUrl(path, session.isSandbox);
   const responseToggleStatus = await fetch(cardStatusUrl, {
     method: "PUT",
     headers: {
@@ -69,7 +69,7 @@ export async function updateCardLimit(cardId: string, limit: number): Promise<bo
     return false;
   }
 
-  const apiUrl = getWirexApiUrl(`/api/v1/cards/${cardId}/limit`, session.isSandbox);
+  const apiUrl = createWirexApiUrl(`api/v1/cards/${cardId}/limit`, session.isSandbox);
 
   try {
     const response = await fetch(apiUrl, {

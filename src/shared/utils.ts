@@ -1,4 +1,4 @@
-import { WIREX_API_URL_PRODUCTION, WIREX_API_URL_SANDBOX } from "../../functions/shared";
+import { createWirexApiUrl } from "../../functions/shared";
 import { SmsResponse } from "../components/register/phone-register";
 import { showToast } from "../components/toaster";
 import { userSigner } from "../main";
@@ -21,16 +21,8 @@ export async function sign(message: string): Promise<string> {
   }
 }
 
-export function getWirexApiUrl(path: string, sandbox: boolean): string {
-  if (sandbox) {
-    return `${WIREX_API_URL_SANDBOX}${path}`;
-  }
-
-  return `${WIREX_API_URL_PRODUCTION}${path}`;
-}
-
 export async function sendOtpForAction(auth: Session, action: "GetCardDetails" | "ConfirmPhone"): Promise<SmsResponse | null> {
-  const smsUrl = getWirexApiUrl("/api/v1/confirmation/sms", auth.isSandbox);
+  const smsUrl = createWirexApiUrl("api/v1/confirmation/sms", auth.isSandbox);
   const responseSms = await fetch(smsUrl, {
     method: "POST",
     headers: {
@@ -57,7 +49,7 @@ export async function sendOtpForAction(auth: Session, action: "GetCardDetails" |
 }
 
 export async function verifyOtp(otp: string, auth: Session, smsResponse: SmsResponse) {
-  const smsVerifyUrl = getWirexApiUrl("/api/v1/confirmation/sms/verify", auth.isSandbox);
+  const smsVerifyUrl = createWirexApiUrl("api/v1/confirmation/sms/verify", auth.isSandbox);
   const responseVerify = await fetch(smsVerifyUrl, {
     method: "POST",
     headers: {

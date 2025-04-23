@@ -1,12 +1,13 @@
 import { getSession } from "../../shared/user-session";
 import { Session } from "../../shared/types";
-import { getWirexApiUrl, sendOtpForAction, verifyOtp } from "../../shared/utils";
+import { sendOtpForAction, verifyOtp } from "../../shared/utils";
 import { Card } from "../../shared/wirex-types";
 import { showPopup } from "../popup";
 import { showToast } from "../toaster";
+import { createWirexApiUrl } from "../../../functions/shared";
 
 export async function getCardNumbers(cardId: string, actionToken: string, auth: Session) {
-  const response = await fetch(getWirexApiUrl(`/api/v1/cards/${cardId}/details`, auth.isSandbox), {
+  const response = await fetch(createWirexApiUrl(`api/v1/cards/${cardId}/details`, auth.isSandbox), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -71,7 +72,7 @@ export async function executeWithOtp(
 }
 
 export async function getCvvCode(cardId: string, actionToken: string, auth: Session) {
-  const response = await fetch(getWirexApiUrl(`/api/v1/cards/${cardId}/cvv`, auth.isSandbox), {
+  const response = await fetch(createWirexApiUrl(`api/v1/cards/${cardId}/cvv`, auth.isSandbox), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

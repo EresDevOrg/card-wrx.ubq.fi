@@ -1,5 +1,5 @@
+import { createWirexApiUrl } from "../../../functions/shared";
 import { getSession } from "../../shared/user-session";
-import { getWirexApiUrl } from "../../shared/utils";
 import { showToast } from "../toaster";
 
 export interface SmsResponse {
@@ -16,7 +16,7 @@ export async function registerPhone(phone: string): Promise<SmsResponse> {
     showToast({ message: "Authentication failed. Try again by refreshing this page.", type: "error" });
     throw new Error("Authentication failed");
   }
-  const updatePhoneUrl = getWirexApiUrl("/api/v1/user/phone-number", session.isSandbox);
+  const updatePhoneUrl = createWirexApiUrl("api/v1/user/phone-number", session.isSandbox);
   const response = await fetch(updatePhoneUrl, {
     method: "PUT",
     headers: {
@@ -38,7 +38,7 @@ export async function registerPhone(phone: string): Promise<SmsResponse> {
 
   console.log("Phone confirmation code sent successfully");
 
-  const smsUrl = getWirexApiUrl("/api/v1/confirmation/sms", session.isSandbox);
+  const smsUrl = createWirexApiUrl("api/v1/confirmation/sms", session.isSandbox);
   const responseSms = await fetch(smsUrl, {
     method: "POST",
     headers: {
@@ -73,7 +73,7 @@ export async function verifyPhone(smsResponse: SmsResponse) {
   const codeInput = document.getElementById("phone-confirmation-code") as HTMLInputElement;
   const verificationCode = codeInput.value;
 
-  const smsVerifyUrl = getWirexApiUrl("/api/v1/confirmation/sms/verify", session.isSandbox);
+  const smsVerifyUrl = createWirexApiUrl("api/v1/confirmation/sms/verify", session.isSandbox);
   const responseVerify = await fetch(smsVerifyUrl, {
     method: "POST",
     headers: {

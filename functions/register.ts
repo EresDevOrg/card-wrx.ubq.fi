@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { getAccessToken } from "./shared";
+import { createWirexApiUrl, getAccessToken } from "./shared";
 import { Context } from "./types";
 
 export async function onRequestPost(ctx: Context): Promise<Response> {
@@ -20,11 +20,11 @@ export async function onRequestPost(ctx: Context): Promise<Response> {
     }
 
     console.log("Is sandbox: ", accessToken.isSandbox);
-    const apiBaseUrl = accessToken.isSandbox ? "https://api-business.wirexpaychain.tech" : "https://api.wirexpaychain.com";
+    const userUrl = createWirexApiUrl("api/v1/user", accessToken.isSandbox);
 
-    console.log("Sending request to", `${apiBaseUrl}/api/v1/user`);
+    console.log("Sending request to", `${userUrl}`);
 
-    const response = await fetch(`${apiBaseUrl}/api/v1/user`, {
+    const response = await fetch(userUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

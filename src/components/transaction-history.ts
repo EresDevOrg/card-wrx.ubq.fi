@@ -1,5 +1,5 @@
+import { createWirexApiUrl } from "../../functions/shared";
 import { getSession } from "../shared/user-session";
-import { getWirexApiUrl } from "../shared/utils";
 import { showToast } from "./toaster";
 
 // Define the TypeScript types based on the provided response body
@@ -86,7 +86,7 @@ export async function loadTransactions() {
   }
 
   try {
-    const response = await fetch(getWirexApiUrl(`/api/v1/transactions/card?page_number=0&page_size=100`, session.isSandbox), {
+    const response = await fetch(createWirexApiUrl(`api/v1/transactions/card?page_number=0&page_size=100`, session.isSandbox), {
       method: "GET",
       headers: {
         Authorization: `Bearer ${session.access_token}`,

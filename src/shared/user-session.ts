@@ -1,7 +1,8 @@
+import { createWirexApiUrl } from "../../functions/shared";
 import { showToast } from "../components/toaster";
 import { backendBaseUrl } from "../constants";
 import { Session } from "./types";
-import { getWirexApiUrl, sign } from "./utils";
+import { sign } from "./utils";
 
 export async function authenticate(wallet: string): Promise<void> {
   const session = getSession();
@@ -40,7 +41,7 @@ export async function authenticate(wallet: string): Promise<void> {
     console.log("Session: ", session);
 
     if (responseAuth.ok) {
-      const cardsUrl = `${getWirexApiUrl("/api/v1/cards?page_number=0&page_size=10", session.isSandbox)}`;
+      const cardsUrl = `${createWirexApiUrl("api/v1/cards?page_number=0&page_size=10", session.isSandbox)}`;
       const cardsResponse = await fetch(cardsUrl, {
         method: "GET",
         headers: {
