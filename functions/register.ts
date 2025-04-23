@@ -1,18 +1,15 @@
 import { ethers } from "ethers";
 import { createWirexApiUrl, getAccessToken } from "./shared";
-import { Context } from "./types";
+import { Context, RegisterParams, registerParamsSchema } from "./types";
+import { Value } from "@sinclair/typebox/value";
 
 export async function onRequestPost(ctx: Context): Promise<Response> {
   try {
     const accessToken = await getAccessToken(ctx.env);
-    const result: { wallet_address: string; email: string; country: string; signature: string } = await ctx.request.json();
+    const registerParams: RegisterParams = Value.Decode(registerParamsSchema, await ctx.request.json());
 
-    console.log("result", result);
-    const { wallet_address: wallet, email, country, signature } = result;
-
-    if (!(wallet && email && country && signature)) {
-      return Response.json({ message: "Missing parameters" }, { status: 400 });
-    }
+    console.log("registerParams", registerParams);
+    const { wallet_address: wallet, email, country, signature } = registerParams;
 
     const isSigValid = ethers.utils.verifyMessage(`Authentication request for ${wallet.toLowerCase()}`, signature).toLowerCase() == wallet.toLowerCase();
     if (!isSigValid) {

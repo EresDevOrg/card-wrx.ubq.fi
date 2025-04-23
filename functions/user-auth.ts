@@ -1,17 +1,14 @@
 import { ethers } from "ethers";
 import { createWirexApiUrl, getAccessToken } from "./shared";
-import { Context } from "./types";
+import { Context, UserAuthParams, userAuthParamsSchema } from "./types";
+import { Value } from "@sinclair/typebox/value";
 
 export async function onRequestPost(ctx: Context): Promise<Response> {
   try {
-    const result: { wallet: string; signature: string } = await ctx.request.json();
+    const userAuthParams: UserAuthParams = Value.Decode(userAuthParamsSchema, await ctx.request.json());
 
-    console.log("result", result);
-    const { wallet, signature } = result;
-
-    if (!wallet || !signature) {
-      return Response.json({ message: "Missing wallet or signature" }, { status: 400 });
-    }
+    console.log("userAuthParams", userAuthParams);
+    const { wallet, signature } = userAuthParams;
 
     const isSigValid = ethers.utils.verifyMessage(`Authentication request for ${wallet.toLowerCase()}`, signature).toLowerCase() == wallet.toLowerCase();
 
