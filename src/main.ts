@@ -99,7 +99,7 @@ export function handleNetworkSwitch() {
   });
 
   appState.subscribeEvents((event: EventsControllerState) => {
-    if (event.data.event == "DISCONNECT_SUCCESS") {
+    if (event.data.event === "DISCONNECT_SUCCESS") {
       clearSession();
       window.location.reload();
     }
