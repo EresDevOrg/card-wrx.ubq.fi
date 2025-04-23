@@ -104,5 +104,6 @@ export default tsEslint.config({
         format: ["strictCamelCase"],
       },
     ],
+    "sonarjs/new-cap": "off",
   },
 });
