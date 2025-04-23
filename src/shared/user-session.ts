@@ -8,9 +8,8 @@ export async function authenticate(wallet: string): Promise<void> {
   const session = getSession();
   const hasTokenExpired = session?.expires_at && new Date(session.expires_at * 1000) < new Date();
   if (!session || hasTokenExpired) {
-    const signature = localStorage.getItem("user-signature");
+    let signature = localStorage.getItem("user-signature");
     if (!signature) {
-      let signature;
       try {
         signature = await sign(`Authentication request for ${wallet.toLowerCase()}`);
         localStorage.setItem("user-signature", signature);
