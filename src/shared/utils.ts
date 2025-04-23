@@ -21,15 +21,15 @@ export async function sign(message: string): Promise<string> {
   }
 }
 
-export async function sendOtpForAction(auth: Session, action: "GetCardDetails" | "ConfirmPhone"): Promise<SmsResponse | null> {
-  const smsUrl = createWirexApiUrl("api/v1/confirmation/sms", auth.isSandbox);
+export async function sendOtpForAction(session: Session, action: "GetCardDetails" | "ConfirmPhone"): Promise<SmsResponse | null> {
+  const smsUrl = createWirexApiUrl("api/v1/confirmation/sms", session.isSandbox);
   const responseSms = await fetch(smsUrl, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
-      Authorization: `Bearer ${auth.access_token}`,
-      "X-User-Wallet": auth.wallet,
+      Authorization: `Bearer ${session.access_token}`,
+      "X-User-Wallet": session.wallet,
     },
     body: JSON.stringify({
       action_type: action,
@@ -48,15 +48,15 @@ export async function sendOtpForAction(auth: Session, action: "GetCardDetails" |
   return smsSendData;
 }
 
-export async function verifyOtp(otp: string, auth: Session, smsResponse: SmsResponse) {
-  const smsVerifyUrl = createWirexApiUrl("api/v1/confirmation/sms/verify", auth.isSandbox);
+export async function verifyOtp(otp: string, session: Session, smsResponse: SmsResponse) {
+  const smsVerifyUrl = createWirexApiUrl("api/v1/confirmation/sms/verify", session.isSandbox);
   const responseVerify = await fetch(smsVerifyUrl, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
-      Authorization: `Bearer ${auth.access_token}`,
-      "X-User-Wallet": auth.wallet,
+      Authorization: `Bearer ${session.access_token}`,
+      "X-User-Wallet": session.wallet,
     },
     body: JSON.stringify({
       code: otp,
