@@ -38,8 +38,6 @@ export const appState = createAppKit({
   },
 });
 
-export const getNetworkId = () => appState.getCaipNetworkId()?.toString();
-
 // providers and signers
 export let provider: ethers.providers.JsonRpcProvider | undefined;
 export let userSigner: ethers.Signer | undefined;
