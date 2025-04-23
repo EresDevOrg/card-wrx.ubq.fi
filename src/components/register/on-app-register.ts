@@ -70,7 +70,7 @@ async function registerUserWithApi(email: string, userAddress: string, country: 
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(`API Error: ${errorData.message || response.statusText}`);
+      throw new Error(`API Error: ${JSON.stringify(errorData)}`);
     }
 
     const data = await response.json();

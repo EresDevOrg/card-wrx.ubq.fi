@@ -36,7 +36,7 @@ export async function onRequestPost(ctx: Context): Promise<Response> {
 
     if (!authResponse.ok) {
       const errorData = await authResponse.json();
-      throw new Error(`API Error: ${errorData.message || authResponse.statusText}`);
+      throw new Error(`API Error: ${JSON.stringify(errorData)}`);
     }
 
     const authData = await authResponse.json();
@@ -57,7 +57,7 @@ export async function onRequestPost(ctx: Context): Promise<Response> {
 
     if (!userResponse.ok) {
       const errorData = await userResponse.json();
-      throw new Error(`API Error: ${errorData.message || userResponse.statusText}`);
+      throw new Error(`API Error: ${JSON.stringify(errorData)}`);
     }
 
     const userData = await userResponse.json();
