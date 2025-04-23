@@ -35,6 +35,7 @@
     "@cloudflare/workers-types": "^4.20250409.0",
     "@reown/appkit": "^1.7.0",
     "@reown/appkit-adapter-ethers5": "^1.7.0",
+    "@sinclair/typebox": "^0.34.33",
     "@ubiquity-dao/rpc-handler": "^1.4.0",
     "dotenv": "^16.4.7",
     "ethers": "5.7.2",
