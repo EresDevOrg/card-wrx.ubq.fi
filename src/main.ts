@@ -112,14 +112,11 @@ export async function mainModule() {
     await initializeState();
     console.log("State initialized");
 
-    const appkitState = appState.getState();
-    if (appkitState.initialized) {
-      await handleRouting();
-      if (typeof window !== "undefined") {
-        window.addEventListener("hashchange", () => {
-          handleRouting().catch(console.error);
-        });
-      }
+    await handleRouting();
+    if (typeof window !== "undefined") {
+      window.addEventListener("hashchange", () => {
+        handleRouting().catch(console.error);
+      });
     }
   } catch (error) {
     console.error("Error in main: ", error);
