@@ -37,10 +37,13 @@ export async function getKycLink(): Promise<void> {
     element.href = data.redirect_uri;
     element.innerText = data.redirect_uri;
     element.target = "_blank";
-    if (kycLink) {
-      kycLink.appendChild(element);
-      kycLink.style.display = "block";
+    if (!kycLink) {
+      console.error("KYC link element not found");
+      return;
     }
+    kycLink.appendChild(element);
+    kycLink.style.display = "block";
+    return;
   }
 
   throw new Error(`Error getting kyc link: ${data}`);
