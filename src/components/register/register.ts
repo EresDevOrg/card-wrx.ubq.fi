@@ -8,7 +8,6 @@ import { registerOnApp } from "./on-app-register";
 import { registerOnChain } from "./on-chain-register";
 import { registerPhone, SmsOtpResponse } from "./phone-register";
 
-// Step states
 export enum RegistrationStep {
   INITIAL,
   ON_CHAIN_REGISTERED,

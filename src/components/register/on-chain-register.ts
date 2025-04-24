@@ -81,7 +81,6 @@ async function checkUserRegistration(provider: ethers.providers.Web3Provider, co
     const signer = provider.getSigner();
     const userAddress = await signer.getAddress();
 
-    // ABI for checking if user is registered
     const checkRegistrationAbi = [
       {
         inputs: [

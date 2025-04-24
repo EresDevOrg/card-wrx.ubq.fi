@@ -38,7 +38,6 @@ export const appState = createAppKit({
   },
 });
 
-// providers and signers
 export let provider: ethers.providers.JsonRpcProvider | undefined;
 export let userSigner: ethers.Signer | undefined;
 let web3Provider: ethers.providers.Web3Provider | undefined;
@@ -60,7 +59,6 @@ export async function initializeProviderAndSigner() {
       await ethereum.request({ method: "eth_requestAccounts" });
     }
 
-    // Create a Web3Provider from window.ethereum
     web3Provider = new ethers.providers.Web3Provider(window.ethereum);
 
     // web3Provider signer will handle transaction signing
@@ -86,7 +84,6 @@ export async function initializeProviderAndSigner() {
 }
 
 export function handleNetworkSwitch() {
-  // network change listener
   appState.subscribeCaipNetworkChange((newState?: { id: string | number; name: string }) => {
     if (newState) {
       initializeProviderAndSigner()

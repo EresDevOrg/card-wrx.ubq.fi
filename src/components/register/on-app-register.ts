@@ -41,7 +41,6 @@ export async function registerOnApp() {
     return false;
   }
 
-  // read country from select dropdown with id country-dropdown
   const countryDropdown = document.getElementById("country-dropdown") as HTMLSelectElement;
   const country = countryDropdown.value;
   if (!country) {
@@ -49,9 +48,7 @@ export async function registerOnApp() {
     return false;
   }
 
-  // Register user with API
   const isSuccess = await registerUserWithApi(email, userAddress, country, signature);
-
   return isSuccess;
 }
 
