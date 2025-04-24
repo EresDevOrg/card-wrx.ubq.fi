@@ -18,38 +18,38 @@ export async function registerOnApp() {
     return false;
   }
 
-  // Get user's wallet address
-  if (window.ethereum) {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
-    const userAddress = await signer.getAddress();
-    let signature;
-    try {
-      signature = await sign(`Authentication request for ${userAddress.toLowerCase()}`);
-    } catch (e) {
-      showToast({
-        message: "Signature is required to register.",
-        type: "error",
-      });
-      console.error("Error signing message: ", e);
-      return false;
-    }
-
-    // read country from select dropdown with id country-dropdown
-    const countryDropdown = document.getElementById("country-dropdown") as HTMLSelectElement;
-    const country = countryDropdown.value;
-    if (!country) {
-      showToast({ message: "We couldn't detect your country. Try to restart the register process.", type: "error" });
-      return false;
-    }
-
-    // Register user with API
-    const isSuccess = await registerUserWithApi(email, userAddress, country, signature);
-
-    return isSuccess;
-  } else {
-    alert("Please install a Web3 wallet like MetaMask to continue.");
+  if (!window.ethereum) {
+    showToast({ message: "Please install a Web3 wallet like MetaMask to continue.", type: "error" });
+    return false;
   }
+
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  const signer = provider.getSigner();
+  const userAddress = await signer.getAddress();
+  let signature;
+  try {
+    signature = await sign(`Authentication request for ${userAddress.toLowerCase()}`);
+  } catch (e) {
+    showToast({
+      message: "Signature is required to register.",
+      type: "error",
+    });
+    console.error("Error signing message: ", e);
+    return false;
+  }
+
+  // read country from select dropdown with id country-dropdown
+  const countryDropdown = document.getElementById("country-dropdown") as HTMLSelectElement;
+  const country = countryDropdown.value;
+  if (!country) {
+    showToast({ message: "We couldn't detect your country. Try to restart the register process.", type: "error" });
+    return false;
+  }
+
+  // Register user with API
+  const isSuccess = await registerUserWithApi(email, userAddress, country, signature);
+
+  return isSuccess;
 }
 
 async function registerUserWithApi(email: string, userAddress: string, country: string, signature: string): Promise<boolean> {
