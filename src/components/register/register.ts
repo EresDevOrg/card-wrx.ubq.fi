@@ -85,8 +85,8 @@ export function getRegisterHtml(): string {
             <input type="tel" id="phone" name="phone" required placeholder="Enter your phone number">
           </div>
           <div style="display: none;">
-            <label for="phone-confirmation-code">Insert code sent to your phone number:</label>
-            <input type="text" id="phone-confirmation-code" name="phone" placeholder="Enter your phone confirmation code">
+            <label for="otp-input">Insert code sent to your phone number:</label>
+            <input type="text" id="otp-input" name="otp-input" placeholder="Enter your phone confirmation code">
           </div>
           <div style="margin-top: 15px;">
             <button type="submit" id="submit-phone" class="button">Submit</button>
@@ -192,7 +192,7 @@ export function addRegisterEvents() {
     (async () => {
       try {
         if (smsOtpResponse) {
-          const codeInput = document.getElementById("phone-confirmation-code") as HTMLInputElement;
+          const codeInput = document.getElementById("otp-input") as HTMLInputElement;
           const verificationCode = codeInput.value;
 
           const verifyOtpResponse = await verifyOtp(verificationCode, session, smsOtpResponse).catch(console.error);
