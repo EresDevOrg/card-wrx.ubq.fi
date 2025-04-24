@@ -19,7 +19,7 @@ export enum RegistrationStep {
 
 let currentStep = RegistrationStep.INITIAL;
 
-let smsResponse: SmsOtpResponse | null = null;
+let smsOtpResponse: SmsOtpResponse | null = null;
 
 export function getRegisterHtml(): string {
   return `
@@ -191,13 +191,13 @@ export function addRegisterEvents() {
 
     (async () => {
       try {
-        if (smsResponse) {
+        if (smsOtpResponse) {
           const codeInput = document.getElementById("phone-confirmation-code") as HTMLInputElement;
           const verificationCode = codeInput.value;
 
-          const smsVerifyData = await verifyOtp(verificationCode, session, smsResponse).catch(console.error);
+          const verifyOtpResponse = await verifyOtp(verificationCode, session, smsOtpResponse).catch(console.error);
 
-          if (smsVerifyData) {
+          if (verifyOtpResponse) {
             showToast({ message: "Your phone number has been verified. Your registration is complete.", type: "success" });
             const step4 = document.getElementById("step-4");
             if (step4) step4.style.display = "none";
@@ -209,7 +209,7 @@ export function addRegisterEvents() {
             showToast({ message: "Invalid verification code. ", type: "error" });
           }
         } else {
-          smsResponse = await registerPhone(phoneNo.value);
+          smsOtpResponse = await registerPhone(phoneNo.value);
           showToast({ message: "An SMS has been sent to you.", type: "success" });
         }
       } catch (error) {

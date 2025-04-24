@@ -11,6 +11,10 @@ export interface SmsOtpResponse {
   resend_at: string;
 }
 
+export interface VerifyOtpResponse {
+  token: string;
+}
+
 export async function registerPhone(phone: string): Promise<SmsOtpResponse> {
   const session = getSession();
   if (!session) {
