@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { backendBaseUrl, wirexRegisterContractAddress } from "../../constants";
+import { backendBaseUrl, wirexAccountContractAddress } from "../../constants";
 import { appState } from "../../main";
 import { wirexPayChain, wirexPayChainTestnet } from "../../shared/wirex-pay-chain";
 import { showToast } from "../toaster";
@@ -22,16 +22,16 @@ export async function registerOnChain(button: HTMLButtonElement) {
       return false;
     }
 
-    const registerContract = wirexRegisterContractAddress[chainId as number];
+    const accountContract = wirexAccountContractAddress[chainId as number];
 
     const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const isRegistered = await checkUserRegistration(provider, registerContract);
+    const isRegistered = await checkUserRegistration(provider, accountContract);
 
     if (isRegistered) {
       showToast({ message: "User already registered on-chain. Proceeding to next step." });
       return true;
     } else {
-      await registerNewUser(provider, registerContract);
+      await registerNewUser(provider, accountContract);
     }
   } finally {
     button.style.pointerEvents = "auto"; // Re-enable clicks
