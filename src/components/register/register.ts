@@ -8,16 +8,6 @@ import { registerOnApp } from "./on-app-register";
 import { registerOnChain } from "./on-chain-register";
 import { registerPhone, SmsOtpResponse } from "./phone-register";
 
-export enum RegistrationStep {
-  INITIAL,
-  ON_CHAIN_REGISTERED,
-  API_REGISTERED,
-  KYC,
-  PHONE_REGISTERED,
-}
-
-let currentStep = RegistrationStep.INITIAL;
-
 let smsOtpResponse: SmsOtpResponse | null = null;
 
 export function getRegisterHtml(): string {
@@ -104,7 +94,6 @@ export function addRegisterEvents() {
     const step1 = document.getElementById("step-1");
     if (step0) step0.style.display = "none";
     if (step1) step1.style.display = "block";
-    currentStep = RegistrationStep.INITIAL;
   });
 
   document.getElementById("register")?.addEventListener("click", (event) => {
@@ -124,11 +113,6 @@ export function addRegisterEvents() {
 
   document.getElementById("email-registration-form")?.addEventListener("submit", (event) => {
     event.preventDefault();
-
-    if (currentStep !== RegistrationStep.ON_CHAIN_REGISTERED) {
-      showToast({ message: "Please complete the previous step first.", type: "error" });
-      return;
-    }
 
     (async () => {
       let success;
@@ -223,7 +207,6 @@ export function updateStep1Ui() {
   const step2 = document.getElementById("step-2");
   if (step1) step1.style.display = "none";
   if (step2) step2.style.display = "block";
-  currentStep = RegistrationStep.ON_CHAIN_REGISTERED;
 }
 
 export function updateStep2Ui() {
@@ -232,7 +215,6 @@ export function updateStep2Ui() {
   const step3 = document.getElementById("step-3");
   if (step2) step2.style.display = "none";
   if (step3) step3.style.display = "block";
-  currentStep = RegistrationStep.API_REGISTERED;
 }
 
 export function updateStep3Ui() {
@@ -240,7 +222,6 @@ export function updateStep3Ui() {
   const step4 = document.getElementById("step-4");
   if (step3) step3.style.display = "none";
   if (step4) step4.style.display = "block";
-  currentStep = RegistrationStep.KYC;
 }
 
 function restoreLastRegisterAttempt() {
