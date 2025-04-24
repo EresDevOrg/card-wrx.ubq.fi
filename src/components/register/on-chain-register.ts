@@ -7,7 +7,7 @@ import { showToast } from "../toaster";
 export async function registerOnChain(button: HTMLButtonElement) {
   try {
     if (!window.ethereum) {
-      alert("Please install a Web3 wallet like MetaMask to continue.");
+      showToast({ message: "Please install a Web3 wallet like MetaMask to continue.", type: "error" });
       return false;
     }
 

@@ -81,7 +81,7 @@ async function registerUserWithApi(email: string, userAddress: string, country: 
     return true;
   } catch (error) {
     console.error("Error registering with API:", error);
-    alert(`Error registering with API: ${error instanceof Error ? error.message : String(error)}`);
+    showToast({ message: "Error registering with API. Please try again.", type: "error" });
     return false;
   }
 }
