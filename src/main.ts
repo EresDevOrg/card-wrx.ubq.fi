@@ -69,11 +69,6 @@ export async function initializeProviderAndSigner() {
 
     await authenticate(userAddress);
 
-    (ethereum as { on: (e: string, f: () => void) => void }).on("accountsChanged", () => {
-      clearSession();
-      window.location.reload();
-    });
-
     (ethereum as { on: (e: string, f: () => void) => void }).on("networkChanged", () => {
       clearSession();
       window.location.reload();
@@ -102,7 +97,7 @@ export function handleNetworkSwitch() {
     }
 
     if (event.data.event === "CONNECT_SUCCESS") {
-      initializeProviderAndSigner().catch(console.error);
+      window.location.reload();
     }
   });
 }
