@@ -84,7 +84,7 @@ export function getRegisterHtml(): string {
             <label for="phone">Phone Number:</label>
             <input type="tel" id="phone" name="phone" required placeholder="Enter your phone number">
           </div>
-          <div style="display: none;">
+          <div style="display: none;" id="otp">
             <label for="otp-input">Insert code sent to your phone number:</label>
             <input type="text" id="otp-input" name="otp-input" placeholder="Enter your phone confirmation code">
           </div>
@@ -183,10 +183,10 @@ export function addRegisterEvents() {
     }
     phoneNo.setAttribute("disabled", "true");
 
-    const phoneDivs = document.getElementById("phone-registration-form")?.children;
+    const otpDiv = document.getElementById("otp");
 
-    if (phoneDivs?.[1]) {
-      (phoneDivs[1] as HTMLElement).style.display = "block";
+    if (otpDiv) {
+      otpDiv.style.display = "block";
     }
 
     (async () => {
