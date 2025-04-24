@@ -52,13 +52,13 @@ export async function executeWithOtp(
       shouldShowCancelButton: true,
       onConfirm: async (otp) => {
         if (otp) {
-          const smsVerifyData: { token: string } = await verifyOtp(otp, session, smsSendData);
-          if (!smsVerifyData) {
+          const verifyOtpResponse = await verifyOtp(otp, session, smsSendData);
+          if (!verifyOtpResponse) {
             showToast({ message: "Failed to verify OTP.", type: "error" });
             return;
           }
 
-          const text = await callback(card.id, smsVerifyData.token, session);
+          const text = await callback(card.id, verifyOtpResponse.token, session);
 
           if (text) {
             element.textContent = text;
