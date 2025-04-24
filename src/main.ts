@@ -100,6 +100,10 @@ export function handleNetworkSwitch() {
       clearSession();
       window.location.reload();
     }
+
+    if (event.data.event === "CONNECT_SUCCESS") {
+      initializeProviderAndSigner().catch(console.error);
+    }
   });
 }
 
