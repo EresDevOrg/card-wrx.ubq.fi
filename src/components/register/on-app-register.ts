@@ -1,8 +1,8 @@
-import { ethers } from "ethers";
 import { backendBaseUrl } from "../../constants";
-import { showToast } from "../toaster";
+import { appState } from "../../main";
 import { getSession } from "../../shared/user-session";
 import { sign } from "../../shared/utils";
+import { showToast } from "../toaster";
 
 export async function registerOnApp() {
   const session = getSession();
@@ -23,9 +23,12 @@ export async function registerOnApp() {
     return false;
   }
 
-  const provider = new ethers.providers.Web3Provider(window.ethereum);
-  const signer = provider.getSigner();
-  const userAddress = await signer.getAddress();
+  const userAddress = appState.getAddress();
+  if (!userAddress) {
+    showToast({ message: "Please connect your wallet.", type: "error" });
+    return false;
+  }
+
   let signature;
   try {
     signature = await sign(`Authentication request for ${userAddress.toLowerCase()}`);
