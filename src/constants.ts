@@ -15,3 +15,8 @@ export const explorersUrl: { [key: string]: string } = {
 };
 
 export const backendBaseUrl = "";
+
+export const wirexRegisterContractAddress: { [chainId: number]: string } = {
+  1001996: "0x062AfB76614dd594A99e70fD2CfbDf417CCF8797",
+  31415: "0x2766F66E572C94a4cbc57f4d5bd2aD71900edF30",
+};

@@ -1,29 +1,37 @@
 import { ethers } from "ethers";
-import { backendBaseUrl } from "../../constants";
+import { backendBaseUrl, wirexRegisterContractAddress } from "../../constants";
 import { appState } from "../../main";
 import { wirexPayChain, wirexPayChainTestnet } from "../../shared/wirex-pay-chain";
 import { showToast } from "../toaster";
 
 export async function registerOnChain(button: HTMLButtonElement) {
   try {
-    const envData = await getEnv();
-    if (!envData) throw new Error("Error getting env.");
-
-    const wirexRegisterContract = await setupNetworkAndContract(envData.isSandbox);
-
     if (!window.ethereum) {
       alert("Please install a Web3 wallet like MetaMask to continue.");
       return false;
     }
 
+    const envData = await getEnv();
+    if (!envData) throw new Error("Error getting env.");
+
+    await appState.switchNetwork(envData.isSandbox ? wirexPayChainTestnet : wirexPayChain);
+
+    const chainId = appState.getChainId();
+    if (!chainId) {
+      showToast({ message: "Error getting chain ID.", type: "error" });
+      return false;
+    }
+
+    const registerContract = wirexRegisterContractAddress[chainId as number];
+
     const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const isRegistered = await checkUserRegistration(provider, wirexRegisterContract);
+    const isRegistered = await checkUserRegistration(provider, registerContract);
 
     if (isRegistered) {
       showToast({ message: "User already registered on-chain. Proceeding to next step." });
       return true;
     } else {
-      await registerNewUser(provider, wirexRegisterContract);
+      await registerNewUser(provider, registerContract);
     }
   } finally {
     button.style.pointerEvents = "auto"; // Re-enable clicks
@@ -41,12 +49,6 @@ async function getEnv() {
     return null;
   }
   return responseJson;
-}
-
-async function setupNetworkAndContract(isSandbox: boolean) {
-  await appState.switchNetwork(isSandbox ? wirexPayChainTestnet : wirexPayChain);
-
-  return isSandbox ? "0x062AfB76614dd594A99e70fD2CfbDf417CCF8797" : "0x2766F66E572C94a4cbc57f4d5bd2aD71900edF30";
 }
 
 async function registerNewUser(provider: ethers.providers.JsonRpcProvider, contractAddress: string) {
