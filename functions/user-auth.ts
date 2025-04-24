@@ -18,8 +18,6 @@ export async function onRequestPost(ctx: Context): Promise<Response> {
 
     const accessToken = await getAccessToken(ctx.env);
 
-    // API endpoint from WirexPayChain partner documentation
-    console.log("Is sandbox: ", accessToken.isSandbox);
     const authUrl = createWirexApiUrl("api/v1/user/authorize", accessToken.isSandbox);
 
     console.log("Sending request to", authUrl);

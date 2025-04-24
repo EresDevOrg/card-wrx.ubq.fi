@@ -16,7 +16,6 @@ export async function onRequestPost(ctx: Context): Promise<Response> {
       return Response.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    console.log("Is sandbox: ", accessToken.isSandbox);
     const userUrl = createWirexApiUrl("api/v1/user", accessToken.isSandbox);
 
     console.log("Sending request to", `${userUrl}`);
