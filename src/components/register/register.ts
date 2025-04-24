@@ -71,7 +71,7 @@ export function getRegisterHtml(): string {
         </div>
         <div id="kyc-link"></div>
         <div style="margin-top: 15px;">
-          <button type="submit" id="next-phone" class="button">Next</button>
+          <button type="submit" id="kyc-submit" class="button">Next</button>
         </div>
       </div>
 
@@ -144,7 +144,7 @@ export function addRegisterEvents() {
     })().catch(console.error);
   });
 
-  document.getElementById("next-phone")?.addEventListener("click", (event) => {
+  document.getElementById("kyc-submit")?.addEventListener("click", (event) => {
     event.preventDefault();
 
     const wallet = appState.getAddress();
