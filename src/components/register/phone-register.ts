@@ -3,7 +3,7 @@ import { getSession } from "../../shared/user-session";
 import { sendOtpForAction } from "../../shared/utils";
 import { showToast } from "../toaster";
 
-export interface SmsResponse {
+export interface SmsOtpResponse {
   session_id: string;
   attempts_left: number;
   expires_at: string;
@@ -11,7 +11,7 @@ export interface SmsResponse {
   resend_at: string;
 }
 
-export async function registerPhone(phone: string): Promise<SmsResponse> {
+export async function registerPhone(phone: string): Promise<SmsOtpResponse> {
   const session = getSession();
   if (!session) {
     showToast({ message: "Authentication failed. Try again by refreshing this page.", type: "error" });
@@ -37,10 +37,10 @@ export async function registerPhone(phone: string): Promise<SmsResponse> {
     throw new Error(`Error updating phone number: ${JSON.stringify(errorData)}`);
   }
 
-  const smsSendData = await sendOtpForAction(session, "ConfirmPhone");
-  if (!smsSendData) {
+  const smsOtpResponse = await sendOtpForAction(session, "ConfirmPhone");
+  if (!smsOtpResponse) {
     throw new Error("Error sending OTP SMS");
   }
 
-  return smsSendData;
+  return smsOtpResponse;
 }

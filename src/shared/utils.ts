@@ -1,5 +1,5 @@
 import { createWirexApiUrl } from "../../functions/shared";
-import { SmsResponse } from "../components/register/phone-register";
+import { SmsOtpResponse } from "../components/register/phone-register";
 import { showToast } from "../components/toaster";
 import { userSigner } from "../main";
 import { Session } from "./types";
@@ -21,7 +21,7 @@ export async function sign(message: string): Promise<string> {
   }
 }
 
-export async function sendOtpForAction(session: Session, action: "GetCardDetails" | "ConfirmPhone"): Promise<SmsResponse | null> {
+export async function sendOtpForAction(session: Session, action: "GetCardDetails" | "ConfirmPhone"): Promise<SmsOtpResponse | null> {
   const smsUrl = createWirexApiUrl("api/v1/confirmation/sms", session.isSandbox);
   const responseSms = await fetch(smsUrl, {
     method: "POST",
@@ -43,12 +43,12 @@ export async function sendOtpForAction(session: Session, action: "GetCardDetails
     return null;
   }
 
-  const smsSendData = await responseSms.json();
-  console.log("Phone confirmation code sent successfully:", smsSendData);
-  return smsSendData;
+  const smsOtpResponse = await responseSms.json();
+  console.log("Phone confirmation code sent successfully:", smsOtpResponse);
+  return smsOtpResponse;
 }
 
-export async function verifyOtp(otp: string, session: Session, smsResponse: SmsResponse) {
+export async function verifyOtp(otp: string, session: Session, smsResponse: SmsOtpResponse) {
   const smsVerifyUrl = createWirexApiUrl("api/v1/confirmation/sms/verify", session.isSandbox);
   const responseVerify = await fetch(smsVerifyUrl, {
     method: "POST",

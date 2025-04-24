@@ -6,7 +6,7 @@ import { getSupportedCountriesHtml } from "./countries-dropdown";
 import { getKycLink } from "./kyc";
 import { registerOnApp } from "./on-app-register";
 import { registerOnChain } from "./on-chain-register";
-import { registerPhone, SmsResponse } from "./phone-register";
+import { registerPhone, SmsOtpResponse } from "./phone-register";
 
 // Step states
 export enum RegistrationStep {
@@ -19,7 +19,7 @@ export enum RegistrationStep {
 
 let currentStep = RegistrationStep.INITIAL;
 
-let smsResponse: SmsResponse | null = null;
+let smsResponse: SmsOtpResponse | null = null;
 
 export function getRegisterHtml(): string {
   return `
