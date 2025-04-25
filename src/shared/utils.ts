@@ -1,6 +1,7 @@
 import { createWirexApiUrl } from "../../functions/shared";
 import { SmsOtpResponse, VerifyOtpResponse } from "../components/register/phone-register";
 import { showToast } from "../components/toaster";
+import { backendBaseUrl } from "../constants";
 import { userSigner } from "../main";
 import { Session } from "./types";
 
@@ -74,4 +75,17 @@ export async function verifyOtp(otp: string, session: Session, smsResponse: SmsO
   console.log("Phone number verified successfully:", smsVerifyData);
 
   return smsVerifyData;
+}
+
+export async function getEnv() {
+  const authUrl = `${backendBaseUrl}/get-env`;
+  const envResponse = await fetch(authUrl, { method: "GET" });
+  const responseJson: { isSandbox: boolean } = await envResponse.json();
+
+  if (envResponse.status !== 200) {
+    showToast({ message: "Error getting env.", type: "error" });
+    console.error("Error getting env: ", responseJson);
+    return null;
+  }
+  return responseJson;
 }

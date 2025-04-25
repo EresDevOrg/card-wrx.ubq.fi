@@ -1,8 +1,9 @@
 import { ethers } from "ethers";
-import { backendBaseUrl, wirexAccountContractAddress } from "../../constants";
+import { wirexAccountContractAddress } from "../../constants";
 import { appState } from "../../main";
 import { wirexPayChain, wirexPayChainTestnet } from "../../shared/wirex-pay-chain";
 import { showToast } from "../toaster";
+import { getEnv } from "../../shared/utils";
 
 export async function registerOnChain(button: HTMLButtonElement) {
   try {
@@ -36,19 +37,6 @@ export async function registerOnChain(button: HTMLButtonElement) {
   } finally {
     button.style.pointerEvents = "auto"; // Re-enable clicks
   }
-}
-
-async function getEnv() {
-  const authUrl = `${backendBaseUrl}/get-env`;
-  const envResponse = await fetch(authUrl, { method: "GET" });
-  const responseJson: { isSandbox: boolean } = await envResponse.json();
-
-  if (envResponse.status !== 200) {
-    showToast({ message: "Error getting env.", type: "error" });
-    console.error("Error getting env: ", responseJson);
-    return null;
-  }
-  return responseJson;
 }
 
 async function registerNewUser(provider: ethers.providers.JsonRpcProvider, contractAddress: string) {
