@@ -185,7 +185,7 @@ export function addRegisterEvents() {
             const step4 = document.getElementById("step-4");
             if (step4) step4.style.display = "none";
 
-            await authenticate(wallet);
+            await reauthenticate(wallet);
           } else {
             showToast({ message: "Invalid verification code. ", type: "error" });
           }
