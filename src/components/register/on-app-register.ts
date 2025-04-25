@@ -62,7 +62,7 @@ async function registerUserWithApi(email: string, userAddress: string, country: 
       },
       body: JSON.stringify({
         email: email,
-        wallet_address: userAddress,
+        wallet: userAddress,
         signature: signature,
         country: country,
       }),

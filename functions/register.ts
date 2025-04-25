@@ -12,7 +12,7 @@ export async function onRequestPost(ctx: Context): Promise<Response> {
 
     const registerParams: RegisterParams = Value.Decode(registerParamsSchema, requestParams);
 
-    const { wallet_address: wallet, email, country, signature } = registerParams;
+    const { wallet, email, country, signature } = registerParams;
 
     const isSigValid = ethers.utils.verifyMessage(`Authentication request for ${wallet.toLowerCase()}`, signature).toLowerCase() == wallet.toLowerCase();
     if (!isSigValid) {
