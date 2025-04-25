@@ -1,5 +1,5 @@
 import { appState } from "../../main";
-import { authenticate, getSession } from "../../shared/user-session";
+import { authenticate, getSession, reauthenticate } from "../../shared/user-session";
 import { verifyOtp } from "../../shared/utils";
 import { showToast } from "../toaster";
 import { getSupportedCountriesHtml } from "./countries-dropdown";
@@ -87,6 +87,12 @@ export function getRegisterHtml(): string {
 }
 
 export function addRegisterEvents() {
+  const wallet = appState.getAddress();
+  if (!wallet) {
+    showToast({ message: "Couldn't detect your wallet address. Please connect your wallet.", type: "error" });
+    return;
+  }
+
   restoreLastRegisterAttempt();
 
   document.getElementById("init-register")?.addEventListener("click", () => {
@@ -115,39 +121,33 @@ export function addRegisterEvents() {
     event.preventDefault();
 
     (async () => {
-      let success;
-      try {
-        success = await registerOnApp();
-        if (success) {
-          updateStep2Ui();
-        }
-      } catch (error) {
-        console.error(error);
+      const isSuccess = await registerOnApp();
+      if (isSuccess) {
+        await authenticate(wallet);
+        updateStep2Ui();
       }
     })().catch(console.error);
   });
 
   document.getElementById("kyc-submit")?.addEventListener("click", (event) => {
     event.preventDefault();
+    reauthenticate(wallet)
+      .then(() => {
+        const session = getSession();
 
-    const wallet = appState.getAddress();
-    if (wallet) {
-      authenticate(wallet)
-        .then(() => {
-          const session = getSession();
-          if (!session) {
-            showToast({ message: "Authentication failed. Try again by refreshing this page.", type: "error" });
-            return;
-          }
-          if (session.user.verification_status !== "Approved") {
-            showToast({ message: "Please complete KYC before next step.", type: "error" });
-            return;
-          }
+        if (!session) {
+          showToast({ message: "Authentication failed. Try again by refreshing this page.", type: "error" });
+          return;
+        }
 
-          updateStep3Ui();
-        })
-        .catch(console.error);
-    }
+        if (session.user.verification_status !== "Approved") {
+          showToast({ message: "Please complete KYC before next step.", type: "error" });
+          return;
+        }
+
+        updateStep3Ui();
+      })
+      .catch(console.error);
   });
 
   document.getElementById("phone-registration-form")?.addEventListener("submit", (event) => {
@@ -184,10 +184,8 @@ export function addRegisterEvents() {
             showToast({ message: "Your phone number has been verified. Your registration is complete.", type: "success" });
             const step4 = document.getElementById("step-4");
             if (step4) step4.style.display = "none";
-            const wallet = appState.getAddress();
-            if (wallet) {
-              await authenticate(wallet);
-            }
+
+            await authenticate(wallet);
           } else {
             showToast({ message: "Invalid verification code. ", type: "error" });
           }

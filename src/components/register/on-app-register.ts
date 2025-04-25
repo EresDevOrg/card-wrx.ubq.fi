@@ -1,7 +1,6 @@
 import { backendBaseUrl } from "../../constants";
 import { appState } from "../../main";
-import { getSession } from "../../shared/user-session";
-import { sign } from "../../shared/utils";
+import { getSession, getSignature } from "../../shared/user-session";
 import { showToast } from "../toaster";
 
 export async function registerOnApp() {
@@ -29,15 +28,12 @@ export async function registerOnApp() {
     return false;
   }
 
-  let signature;
-  try {
-    signature = await sign(`Authentication request for ${userAddress.toLowerCase()}`);
-  } catch (e) {
+  const signature = await getSignature(userAddress);
+  if (!signature) {
     showToast({
-      message: "Signature is required to register.",
+      message: "Signature is required to use the app.",
       type: "error",
     });
-    console.error("Error signing message: ", e);
     return false;
   }
 
