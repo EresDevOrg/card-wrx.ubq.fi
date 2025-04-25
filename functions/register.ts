@@ -1,14 +1,17 @@
+import { Value } from "@sinclair/typebox/value";
 import { ethers } from "ethers";
 import { createWirexApiUrl, getAccessToken } from "./shared";
 import { Context, RegisterParams, registerParamsSchema } from "./types";
-import { Value } from "@sinclair/typebox/value";
 
 export async function onRequestPost(ctx: Context): Promise<Response> {
   try {
     const accessToken = await getAccessToken(ctx.env);
-    const registerParams: RegisterParams = Value.Decode(registerParamsSchema, await ctx.request.json());
 
-    console.log("registerParams", registerParams);
+    const requestParams = await ctx.request.json();
+    console.log("requestParams", requestParams);
+
+    const registerParams: RegisterParams = Value.Decode(registerParamsSchema, requestParams);
+
     const { wallet_address: wallet, email, country, signature } = registerParams;
 
     const isSigValid = ethers.utils.verifyMessage(`Authentication request for ${wallet.toLowerCase()}`, signature).toLowerCase() == wallet.toLowerCase();

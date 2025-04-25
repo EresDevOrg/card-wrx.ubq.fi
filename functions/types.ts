@@ -1,5 +1,6 @@
 import { EventContext } from "@cloudflare/workers-types";
 import { Type, type Static } from "@sinclair/typebox";
+import { FormatRegistry } from "@sinclair/typebox";
 
 export interface Env {
   USE_WIREX_SANDBOX: string;
@@ -21,10 +22,15 @@ export interface WirexAuthResponse {
 
 export type Context = EventContext<Env, string, Record<string, string>>;
 
+// eslint-disable-next-line sonarjs/slow-regex
+FormatRegistry.Set("email", (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value));
+ 
+FormatRegistry.Set("country-iso-alpha-2", (value: string) => /^[a-zA-Z]{2}$/.test(value));
+
 export const registerParamsSchema = Type.Object({
   wallet_address: Type.String(),
   email: Type.String({ format: "email" }),
-  country: Type.String({ format: "iso3166-1-alpha-2" }),
+  country: Type.String({ format: "country-iso-alpha-2" }),
   signature: Type.String(),
 });
 
