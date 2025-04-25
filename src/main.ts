@@ -1,12 +1,13 @@
 import { createAppKit, EventsControllerState } from "@reown/appkit";
 import { Ethers5Adapter } from "@reown/appkit-adapter-ethers5";
-import { anvil, AppKitNetwork, mainnet } from "@reown/appkit/networks";
+import { AppKitNetwork } from "@reown/appkit/networks";
 import { ethers } from "ethers";
 import { providersUrl } from "./constants";
 import { initializeState } from "./on-load";
 import { handleRouting } from "./router";
 import { useRpcHandler } from "./shared/use-rpc-handler";
 import { authenticate, clearSession } from "./shared/user-session";
+import { getEnv } from "./shared/utils";
 import { wirexPayChain, wirexPayChainTestnet } from "./shared/wirex-pay-chain";
 
 const projectId = "f8d73ee74421cc7790740554fa587b94";
@@ -18,14 +19,7 @@ const metadata = {
   icons: ["https://avatars.githubusercontent.com/u/76412717"],
 };
 
-let networks: [AppKitNetwork, ...AppKitNetwork[]];
-
-if (window.location.hostname === "localhost" || window.location.hostname === "0.0.0.0") {
-  console.log("enabling anvil");
-  networks = [wirexPayChainTestnet, mainnet, wirexPayChain, anvil];
-} else {
-  networks = [wirexPayChainTestnet, mainnet, wirexPayChain];
-}
+const networks: [AppKitNetwork, ...AppKitNetwork[]] = [wirexPayChainTestnet, wirexPayChain];
 
 export const appState = createAppKit({
   adapters: [new Ethers5Adapter()],
@@ -68,26 +62,36 @@ export async function initializeProviderAndSigner() {
     console.log("User address:", userAddress);
 
     await authenticate(userAddress);
-
-    (ethereum as { on: (e: string, f: () => void) => void }).on("networkChanged", () => {
-      clearSession();
-      window.location.reload();
-    });
   } else {
     userSigner = undefined;
   }
 }
 
 export function handleNetworkSwitch() {
-  appState.subscribeCaipNetworkChange((newState?: { id: string | number; name: string }) => {
-    if (newState) {
-      initializeProviderAndSigner()
-        .then(() => {
-          window.location.reload();
-          console.log(`Network switched to ${newState.name} (${newState.id})`);
-        })
-        .catch(console.error);
-    }
+  appState.subscribeCaipNetworkChange(() => {
+    getEnv()
+      .then((envData) => {
+        if (envData?.isSandbox === false) {
+          console.log("Switching to WirePayChain mainnet as configured.");
+          appState
+            .switchNetwork(wirexPayChain)
+            .then(() => {
+              clearSession();
+              window.location.reload();
+            })
+            .catch(console.error);
+        } else {
+          console.log("Switching to WirePayChain testnet as configured.");
+          appState
+            .switchNetwork(wirexPayChainTestnet)
+            .then(() => {
+              clearSession();
+              window.location.reload();
+            })
+            .catch(console.error);
+        }
+      })
+      .catch(console.error);
   });
 
   appState.subscribeEvents((event: EventsControllerState) => {
