@@ -2,7 +2,6 @@ import { createWirexApiUrl } from "../../functions/shared";
 import { getSession } from "../shared/user-session";
 import { showToast } from "./toaster";
 
-// Define the TypeScript types based on the provided response body
 interface MerchantAmount {
   amount: number;
   currency: string;
