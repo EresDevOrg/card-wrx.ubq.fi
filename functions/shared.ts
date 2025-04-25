@@ -6,7 +6,7 @@ export const WIREX_API_URL_SANDBOX = "https://api-business.wirexpaychain.tech";
 export const WIREX_API_URL_PRODUCTION = "https://api-business.wirexpaychain.tech";
 
 export async function getAccessToken(env: Env): Promise<AccessToken> {
-  console.log("Using Wirex Sandbox:", env.USE_WIREX_SANDBOX !== "false");
+  console.log("Using Wirex Sandbox:", isSandbox(env));
   const options = {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -14,11 +14,12 @@ export async function getAccessToken(env: Env): Promise<AccessToken> {
       client_id: env.WIREX_CLIENT_ID,
       client_secret: env.WIREX_CLIENT_SECRET,
       grant_type: "client_credentials",
-      audience: env.USE_WIREX_SANDBOX === "false" ? WIREX_API_URL_PRODUCTION : WIREX_API_URL_SANDBOX,
+      audience: isSandbox(env) ? WIREX_API_URL_SANDBOX : WIREX_API_URL_PRODUCTION,
     }),
   };
 
-  const authUrl = env.USE_WIREX_SANDBOX === "false" ? WIREX_AUTH_URL_PRODUCTION : WIREX_AUTH_URL_SANDBOX;
+  const authUrl = isSandbox(env) ? WIREX_AUTH_URL_SANDBOX : WIREX_AUTH_URL_PRODUCTION;
+
   const res = await fetch(authUrl, options);
 
   console.log("Response status:", res.status);
@@ -38,7 +39,13 @@ export async function getAccessToken(env: Env): Promise<AccessToken> {
 }
 
 export function isSandbox(env: Env): boolean {
-  return env.USE_WIREX_SANDBOX !== "false";
+  if (env.USE_WIREX_SANDBOX === "false") {
+    return false;
+  }
+  if (env.USE_WIREX_SANDBOX === "true") {
+    return true;
+  }
+  throw new Error(`Invalid env USE_WIREX_SANDBOX value: ${env.USE_WIREX_SANDBOX}`);
 }
 
 export function createWirexApiUrl(path: string, useSandbox: boolean): string {
