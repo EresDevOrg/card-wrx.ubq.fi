@@ -4,6 +4,9 @@ import { appState } from "../../main";
 import { wirexPayChain, wirexPayChainTestnet } from "../../shared/wirex-pay-chain";
 import { showToast } from "../toaster";
 import { getEnv } from "../../shared/utils";
+import { wirexAccountContractAbi } from "../../shared/wirex-account-contract-abi";
+
+const wirexParentEntity = "0x00000000000000000000000000000014";
 
 export async function registerOnChain(button: HTMLButtonElement) {
   try {
@@ -41,19 +44,8 @@ export async function registerOnChain(button: HTMLButtonElement) {
 
 async function registerNewUser(provider: ethers.providers.JsonRpcProvider, contractAddress: string) {
   const signer = provider.getSigner();
-  const wirexContractAbi = [
-    {
-      type: "function",
-      name: "createAccount",
-      constant: false,
-      payable: false,
-      inputs: [],
-      outputs: [],
-    },
-  ];
-
-  const wirexContract = new ethers.Contract(contractAddress, wirexContractAbi, signer);
-  const tx = await wirexContract.createAccount();
+  const wirexContract = new ethers.Contract(contractAddress, wirexAccountContractAbi, signer);
+  const tx = await wirexContract.createUserAccount(wirexParentEntity);
   const receipt = await tx.wait();
   if (receipt.status === 1) {
     showToast({ message: "Successfully registered on-chain! Please complete step 2." });
@@ -69,42 +61,8 @@ async function checkUserRegistration(provider: ethers.providers.Web3Provider, co
     const signer = provider.getSigner();
     const userAddress = await signer.getAddress();
 
-    const checkRegistrationAbi = [
-      {
-        inputs: [
-          {
-            internalType: "address",
-            name: "owner",
-            type: "address",
-          },
-        ],
-        name: "getAccount",
-        outputs: [
-          {
-            components: [
-              {
-                internalType: "enum IAccounts.AccountStatus",
-                name: "status",
-                type: "uint8",
-              },
-              {
-                internalType: "enum IAccounts.AccountVerificationStatus",
-                name: "verificationStatus",
-                type: "uint8",
-              },
-            ],
-            internalType: "struct IAccounts.Account",
-            name: "",
-            type: "tuple",
-          },
-        ],
-        stateMutability: "view",
-        type: "function",
-      },
-    ];
-
-    const contract = new ethers.Contract(contractAddress, checkRegistrationAbi, provider);
-    const accountInfo = await contract.getAccount(userAddress);
+    const contract = new ethers.Contract(contractAddress, wirexAccountContractAbi, provider);
+    const accountInfo = await contract.getUserAccount(userAddress, wirexParentEntity);
 
     // AccountStatus is a enum for account status
     // - Pending status means that account has been created but not activated and cannot be used
