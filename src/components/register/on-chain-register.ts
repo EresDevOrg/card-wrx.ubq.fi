@@ -59,7 +59,7 @@ async function registerNewUser(provider: ethers.providers.JsonRpcProvider, contr
     showToast({ message: "Successfully registered on-chain! Please complete step 2." });
     return true;
   } else {
-    showToast({ message: "Error registering on chain. Check on block explorer." });
+    showToast({ message: "Error registering on chain. Check block explorer for details." });
     return false;
   }
 }

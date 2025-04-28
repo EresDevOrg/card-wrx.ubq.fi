@@ -21,7 +21,7 @@ export function addHomeEvents() {
     proceedToRegister.addEventListener("click", (event) => {
       if (!appState.getIsConnectedState()) {
         event.preventDefault();
-        showToast({ message: "Please connect your wallet first.", type: "error" });
+        showToast({ message: "Please connect your wallet.", type: "error" });
       }
     });
   }

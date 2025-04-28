@@ -37,8 +37,7 @@ export function addMintCardEvents() {
 
       try {
         const user = session.user;
-        // Check verification status (assuming the response structure matches the original logic)
-        // // Change it to Approved later
+
         if (user.verification_status !== "Approved") {
           showToast({
             message: "You are not verified. Please complete your KYC before minting a card.",
@@ -47,7 +46,6 @@ export function addMintCardEvents() {
           return;
         }
 
-        // Check user status
         if (user.user_status !== "Active") {
           showToast({
             message: "Your account is not active to mint a card.",

@@ -28,15 +28,12 @@ export function showPopup(options: PopupOptions): Promise<string | boolean | und
       defaultValue = "",
     } = options;
 
-    // Create backdrop
     const backdrop = document.createElement("div");
     backdrop.className = "popup-backdrop";
 
-    // Create container
     const container = document.createElement("div");
     container.className = `popup-container popup-${type}`;
 
-    // Title (optional)
     if (title) {
       const titleElement = document.createElement("h2");
       titleElement.className = "popup-title";
@@ -44,13 +41,11 @@ export function showPopup(options: PopupOptions): Promise<string | boolean | und
       container.appendChild(titleElement);
     }
 
-    // Message
     const messageElement = document.createElement("div");
     messageElement.className = "popup-message";
     messageElement.textContent = message;
     container.appendChild(messageElement);
 
-    // Input for prompt
     let inputElement: HTMLInputElement | undefined;
     if (isPrompt) {
       inputElement = document.createElement("input");
@@ -61,11 +56,9 @@ export function showPopup(options: PopupOptions): Promise<string | boolean | und
       container.appendChild(inputElement);
     }
 
-    // Buttons container
     const buttonsContainer = document.createElement("div");
     buttonsContainer.className = "popup-buttons";
 
-    // Cancel button (optional)
     if (shouldShowCancelButton) {
       const cancelButton = document.createElement("button");
       cancelButton.className = "popup-button popup-button-cancel";
@@ -78,7 +71,6 @@ export function showPopup(options: PopupOptions): Promise<string | boolean | und
       buttonsContainer.appendChild(cancelButton);
     }
 
-    // Confirm button
     const confirmButton = document.createElement("button");
     confirmButton.className = "popup-button popup-button-confirm";
     confirmButton.textContent = confirmText;
@@ -98,7 +90,6 @@ export function showPopup(options: PopupOptions): Promise<string | boolean | und
     document.body.appendChild(backdrop);
     backdrop.appendChild(container);
 
-    // Animation
     setTimeout(() => {
       backdrop.classList.add("show");
       container.classList.add("show");

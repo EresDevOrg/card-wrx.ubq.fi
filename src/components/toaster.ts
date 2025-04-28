@@ -8,7 +8,6 @@ interface ToasterOptions {
 export function showToast(options: ToasterOptions): void {
   const { message, type = "info", duration = 3000 } = options;
 
-  // Create or get container
   let container = document.querySelector(".toaster-container") as HTMLElement;
   if (!container) {
     container = document.createElement("div");
@@ -16,7 +15,6 @@ export function showToast(options: ToasterOptions): void {
     document.body.appendChild(container);
   }
 
-  // Create toast element
   const toast = document.createElement("div");
   toast.className = `toast toast-${type}`;
   toast.innerHTML = `
@@ -26,13 +24,10 @@ export function showToast(options: ToasterOptions): void {
 
   container.appendChild(toast);
 
-  // Trigger animation
   setTimeout(() => toast.classList.add("show"), 100);
 
-  // Auto-remove after duration
   const timeout = setTimeout(() => removeToast(toast), duration);
 
-  // Close button functionality
   const closeButton = toast.querySelector(".toast-close") as HTMLButtonElement;
   closeButton?.addEventListener("click", () => {
     clearTimeout(timeout);
