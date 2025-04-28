@@ -67,29 +67,19 @@ export async function initializeProviderAndSigner() {
   }
 }
 
-export function handleNetworkSwitch() {
+export function subscribeWalletEvents() {
   appState.subscribeCaipNetworkChange(() => {
     getEnv()
       .then((envData) => {
-        if (envData?.isSandbox === false) {
-          console.log("Switching to WirePayChain mainnet as configured.");
-          appState
-            .switchNetwork(wirexPayChain)
-            .then(() => {
-              clearSession();
-              window.location.reload();
-            })
-            .catch(console.error);
-        } else {
-          console.log("Switching to WirePayChain testnet as configured.");
-          appState
-            .switchNetwork(wirexPayChainTestnet)
-            .then(() => {
-              clearSession();
-              window.location.reload();
-            })
-            .catch(console.error);
-        }
+        console.log(`Switching to WirePayChain ${envData?.isSandbox === false ? "mainnet" : "testnet"} as configured.`);
+
+        appState
+          .switchNetwork(envData?.isSandbox === false ? wirexPayChain : wirexPayChainTestnet)
+          .then(() => {
+            clearSession();
+            window.location.reload();
+          })
+          .catch(console.error);
       })
       .catch(console.error);
   });
@@ -110,7 +100,7 @@ export async function mainModule() {
   try {
     await initializeProviderAndSigner();
     console.log("Provider:", provider);
-    handleNetworkSwitch();
+    subscribeWalletEvents();
 
     await initializeState();
     console.log("State initialized");
