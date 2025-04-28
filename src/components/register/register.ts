@@ -142,7 +142,7 @@ export function addRegisterEvents() {
         }
 
         if (session.user.verification_status !== "Approved") {
-          showToast({ message: "Please complete KYC before next step.", type: "error" });
+          showToast({ message: "Please complete KYC before proceeding. If done, allow a few minutes for updates.", type: "error" });
           return;
         }
 
