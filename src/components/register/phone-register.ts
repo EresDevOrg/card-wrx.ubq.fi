@@ -30,7 +30,7 @@ export async function registerPhone(phone: string): Promise<SmsOtpResponse> {
     throw new Error(`Error updating phone number: ${JSON.stringify(errorData)}`);
   }
 
-  const smsOtpResponse = await sendOtpForAction(session, "ConfirmPhone");
+  const smsOtpResponse = await sendOtpForAction(session, "VerifyPhone");
   if (!smsOtpResponse) {
     throw new Error("Error sending OTP SMS");
   }

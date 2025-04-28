@@ -22,7 +22,7 @@ export async function sign(message: string): Promise<string> {
   }
 }
 
-export async function sendOtpForAction(session: Session, action: "GetCardDetails" | "ConfirmPhone"): Promise<SmsOtpResponse | null> {
+export async function sendOtpForAction(session: Session, action: "GetCardDetails" | "ConfirmPhone" | "VerifyPhone"): Promise<SmsOtpResponse | null> {
   const smsUrl = createWirexApiUrl("api/v1/confirmation/sms", session.isSandbox);
   const responseSms = await fetch(smsUrl, {
     method: "POST",
