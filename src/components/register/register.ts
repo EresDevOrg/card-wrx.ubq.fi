@@ -1,12 +1,13 @@
 import { appState } from "../../main";
 import { authenticate, getSession, reauthenticate } from "../../shared/user-session";
 import { verifyOtp } from "../../shared/utils";
+import { SmsOtpResponse } from "../../shared/wirex-types";
 import { showToast } from "../toaster";
 import { getSupportedCountriesHtml } from "./countries-dropdown";
 import { getKycLink } from "./kyc";
 import { registerOnApp } from "./on-app-register";
 import { registerOnChain } from "./on-chain-register";
-import { registerPhone, SmsOtpResponse } from "./phone-register";
+import { registerPhone } from "./phone-register";
 
 let smsOtpResponse: SmsOtpResponse | null = null;
 
