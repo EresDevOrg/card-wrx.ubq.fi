@@ -1,19 +1,8 @@
 import { createWirexApiUrl } from "../../../functions/shared";
 import { getSession } from "../../shared/user-session";
 import { sendOtpForAction } from "../../shared/utils";
+import { SmsOtpResponse } from "../../shared/wirex-types";
 import { showToast } from "../toaster";
-
-export interface SmsOtpResponse {
-  session_id: string;
-  attempts_left: number;
-  expires_at: string;
-  code_length: number;
-  resend_at: string;
-}
-
-export interface VerifyOtpResponse {
-  token: string;
-}
 
 export async function registerPhone(phone: string): Promise<SmsOtpResponse> {
   const session = getSession();

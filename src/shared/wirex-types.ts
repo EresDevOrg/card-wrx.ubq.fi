@@ -73,3 +73,15 @@ export interface User {
     is_confirmed: boolean;
   };
 }
+
+export interface SmsOtpResponse {
+  session_id: string;
+  attempts_left: number;
+  expires_at: string;
+  code_length: number;
+  resend_at: string;
+}
+
+export interface VerifyOtpResponse {
+  token: string;
+}

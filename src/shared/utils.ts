@@ -1,9 +1,9 @@
 import { createWirexApiUrl } from "../../functions/shared";
-import { SmsOtpResponse, VerifyOtpResponse } from "../components/register/phone-register";
 import { showToast } from "../components/toaster";
 import { backendBaseUrl } from "../constants";
 import { userSigner } from "../main";
 import { Session } from "./types";
+import { SmsOtpResponse, VerifyOtpResponse } from "./wirex-types";
 
 export async function sign(message: string): Promise<string> {
   try {
