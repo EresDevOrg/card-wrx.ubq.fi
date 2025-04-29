@@ -1,10 +1,10 @@
 import { appState } from "../../main";
-import { authenticate, getSession, reauthenticate } from "../../shared/user-session";
+import { getSession, reauthenticate } from "../../shared/user-session";
 import { verifyOtp } from "../../shared/utils";
 import { SmsOtpResponse } from "../../shared/wirex-types";
 import { showToast } from "../toaster";
 import { getSupportedCountriesHtml } from "./countries-dropdown";
-import { getKycLink } from "./kyc";
+import { getKycLink, isKycApproved } from "./kyc";
 import { registerOnApp } from "./on-app-register";
 import { registerOnChain } from "./on-chain-register";
 import { registerPhone } from "./phone-register";
@@ -124,7 +124,7 @@ export function addRegisterEvents() {
     (async () => {
       const isSuccess = await registerOnApp();
       if (isSuccess) {
-        await authenticate(wallet);
+        await reauthenticate(wallet);
         updateStep2Ui();
       }
     })().catch(console.error);
@@ -134,18 +134,10 @@ export function addRegisterEvents() {
     event.preventDefault();
     reauthenticate(wallet)
       .then(() => {
-        const session = getSession();
-
-        if (!session) {
-          showToast({ message: "Authentication failed. Try again by refreshing this page.", type: "error" });
-          return;
-        }
-
-        if (session.user.verification_status !== "Approved") {
+        if (!isKycApproved()) {
           showToast({ message: "Please complete KYC before proceeding. If done, allow a few minutes for updates.", type: "error" });
           return;
         }
-
         updateStep3Ui();
       })
       .catch(console.error);

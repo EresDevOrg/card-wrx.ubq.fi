@@ -16,6 +16,12 @@ export async function getKycLink(): Promise<void> {
     return;
   }
 
+  const kycLink = document.getElementById("kyc-link");
+  if (kycLink && isKycApproved()) {
+    kycLink.innerText = "Your KYC has been approved.";
+    return;
+  }
+
   const kycLinkUrl = createWirexApiUrl("api/v1/user/verification-link", session.isSandbox);
 
   const response = await fetch(kycLinkUrl, {
@@ -32,7 +38,7 @@ export async function getKycLink(): Promise<void> {
 
   if (response.ok) {
     console.log("kyc link response data", data);
-    const kycLink = document.getElementById("kyc-link");
+
     const element = document.createElement("a");
     element.href = data.redirect_uri;
     element.innerText = data.redirect_uri;
@@ -47,4 +53,9 @@ export async function getKycLink(): Promise<void> {
   }
 
   throw new Error(`Error getting kyc link: ${data}`);
+}
+
+export function isKycApproved(): boolean {
+  const session = getSession();
+  return session?.user.verification_status === "Approved";
 }
