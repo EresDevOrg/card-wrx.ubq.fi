@@ -7,9 +7,9 @@ export async function loadCardSettingsPage() {
 
   try {
     if (appState.getIsConnectedState()) {
-      const content = getCardSettingsHtml();
+      const content = await getCardSettingsHtml();
       contentArea.innerHTML = content;
-      addCardSettingsEvents();
+      await addCardSettingsEvents();
     } else {
       contentArea.innerHTML = `<div class="connect-request">Connect your wallet to use this page.</div>`;
     }

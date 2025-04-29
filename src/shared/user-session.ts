@@ -3,6 +3,7 @@ import { showToast } from "../components/toaster";
 import { backendBaseUrl } from "../constants";
 import { Session } from "./types";
 import { sign } from "./utils";
+import { Card } from "./wirex-types";
 
 export async function authenticate(wallet: string): Promise<void> {
   const session = getSession();
@@ -39,24 +40,7 @@ export async function reauthenticate(wallet: string): Promise<void> {
 
   console.log("Session: ", session);
 
-  if (responseAuth.ok) {
-    const cardsUrl = `${createWirexApiUrl("api/v1/cards?page_number=0&page_size=10", session.isSandbox)}`;
-    const cardsResponse = await fetch(cardsUrl, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${session.access_token}`,
-        Accept: "application/json",
-        "X-User-Wallet": session.wallet,
-      },
-    });
-
-    const cards = await cardsResponse.json();
-    console.log("cards", cards);
-    if (cards.data) {
-      session.cards = cards.data;
-    }
-    localStorage.setItem("session", JSON.stringify(session));
-  }
+  localStorage.setItem("session", JSON.stringify(session));
 }
 
 export function getSession(): Session | null {
@@ -71,6 +55,7 @@ export function getSession(): Session | null {
 export function clearSession() {
   localStorage.removeItem("session");
   localStorage.removeItem("user-signature");
+  localStorage.removeItem("user-cards");
 }
 
 export async function getSignature(wallet: string): Promise<string | null> {
@@ -87,4 +72,50 @@ export async function getSignature(wallet: string): Promise<string | null> {
   }
 
   return signature;
+}
+
+async function loadCards(): Promise<Card[] | null> {
+  const session = getSession();
+  if (!session) {
+    console.error("Session not found");
+    return null;
+  }
+
+  const cardsUrl = `${createWirexApiUrl("api/v1/cards?page_number=0&page_size=10", session.isSandbox)}`;
+  const cardsResponse = await fetch(cardsUrl, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${session.access_token}`,
+      Accept: "application/json",
+      "X-User-Wallet": session.wallet,
+    },
+  });
+
+  const cards = await cardsResponse.json();
+  console.log("cards", cards);
+  if (cards.data) {
+    return cards.data;
+  }
+
+  return null;
+}
+
+export async function getUserCards(): Promise<Card[]> {
+  const userCardsRaw = localStorage.getItem("user-cards");
+  if (userCardsRaw) {
+    return JSON.parse(userCardsRaw);
+  }
+
+  const cards = await loadCards();
+  if (cards) {
+    localStorage.setItem("user-cards", JSON.stringify(cards));
+    return cards;
+  }
+
+  return [];
+}
+
+export async function updateCardsStorage() {
+  const cards = await loadCards();
+  localStorage.setItem("user-cards", JSON.stringify(cards));
 }

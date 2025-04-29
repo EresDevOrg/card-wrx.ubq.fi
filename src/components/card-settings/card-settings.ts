@@ -1,10 +1,10 @@
-import { getSession } from "../../shared/user-session";
-import { Card } from "../../shared/wirex-types";
+import { getSession, getUserCards, updateCardsStorage } from "../../shared/user-session";
+import { Balance } from "../../shared/wirex-types";
 import { showToast } from "../toaster";
 import { toggleStatus, updateActiveBalance, updateCardLimit } from "./non-otp-actions";
 import { executeWithOtp, getCardNumbers, getCvvCode } from "./otp-actions";
 
-export function getCardSettingsHtml(): string {
+export async function getCardSettingsHtml(): Promise<string> {
   const hash = window.location.hash;
   const cardId = hash.split("/").pop();
 
@@ -12,18 +12,15 @@ export function getCardSettingsHtml(): string {
     return `<div class="container"><h2>Card ID not found in URL</h2></div>`;
   }
 
-  const session = getSession();
-  let card: Card | null = null;
-  if (session) {
-    card = session.cards?.find((card) => card.id === cardId) ?? null;
-  }
-  if (!card) {
+  const cards = await getUserCards();
+  const selectedCard = cards?.find((card) => card.id === cardId) ?? null;
+  if (!selectedCard) {
     return `<div class="container"><h2>Card not found</h2></div>`;
   }
 
   return `
  <div class="container">
-        <h2>${card.card_data.format} ${card.card_data.payment_system} ${card.card_data.card_number_last_4}</h2>
+        <h2>${selectedCard.card_data.format} ${selectedCard.card_data.payment_system} ${selectedCard.card_data.card_number_last_4}</h2>
 
         <div class="detail-row">
             <span class="detail-label">ID:</span>
@@ -58,7 +55,7 @@ export function getCardSettingsHtml(): string {
             <div class="active-balance-container">
                 <span class="read-only" id="active-balance"></span>
                 <select id="new-active-balance">
-                    ${card.balances
+                    ${selectedCard.balances
                       .map((balance) => {
                         const isActive = balance.is_active;
                         return `<option value="${balance.token_address}" ${isActive ? "selected" : ""}>${balance.token_symbol} ${balance.balance}</option>`;
@@ -95,18 +92,17 @@ export function getCardSettingsHtml(): string {
   `;
 }
 
-export function addCardSettingsEvents() {
+export async function addCardSettingsEvents() {
   const hash = window.location.hash;
   const cardId = hash.split("/").pop();
 
-  const session = getSession();
-  let card: Card | null = null;
-  if (session) {
-    card = session.cards?.find((card) => card.id === cardId) ?? null;
-  }
-  if (!card) {
+  const cards = await getUserCards();
+  const selectedCard = cards?.find((card) => card.id === cardId) ?? null;
+  if (!selectedCard) {
     return;
   }
+
+  const session = getSession();
 
   const cardIdElement = document.getElementById("card-id") as HTMLSpanElement;
   const userNameElement = document.getElementById("user-name") as HTMLSpanElement;
@@ -144,9 +140,10 @@ export function addCardSettingsEvents() {
       const isSuccess = await updateCardLimit(cardId, newLimit);
 
       if (isSuccess) {
-        card.limit.daily_limit = newLimit;
-        cardLimitElement.textContent = `Daily: ${card.limit.daily_limit} / Used: ${card.limit.daily_usage ? card.limit.daily_usage : 0}`;
+        selectedCard.limit.daily_limit = newLimit;
+        cardLimitElement.textContent = `Daily: ${selectedCard.limit.daily_limit} / Used: ${selectedCard.limit.daily_usage ? selectedCard.limit.daily_usage : 0}`;
         showToast({ message: "Card limit updated successfully.", type: "success" });
+        await updateCardsStorage();
       } else {
         showToast({ message: "Failed to update card limit.", type: "error" });
       }
@@ -155,12 +152,13 @@ export function addCardSettingsEvents() {
 
   statusButton.addEventListener("click", () => {
     (async () => {
-      const isSuccess = await toggleStatus(card);
+      const isSuccess = await toggleStatus(selectedCard);
       if (isSuccess) {
-        card.status = card.status === "Blocked" ? "Active" : "Blocked";
-        statusText.textContent = card.status;
-        statusButton.textContent = card.status === "Blocked" ? "Unblock" : "Block";
-        showToast({ message: `Card is ${card.status.toLowerCase()} now.`, type: "success" });
+        selectedCard.status = selectedCard.status === "Blocked" ? "Active" : "Blocked";
+        statusText.textContent = selectedCard.status;
+        statusButton.textContent = selectedCard.status === "Blocked" ? "Unblock" : "Block";
+        showToast({ message: `Card is ${selectedCard.status.toLowerCase()} now.`, type: "success" });
+        await updateCardsStorage();
       } else {
         showToast({ message: "Failed to update card status.", type: "error" });
       }
@@ -168,11 +166,15 @@ export function addCardSettingsEvents() {
   });
 
   revealCardNumberButton.addEventListener("click", () => {
-    executeWithOtp(getCardNumbers, cardNumberMaskedElement, card).catch((error) => console.error(error));
+    executeWithOtp(getCardNumbers, cardNumberMaskedElement, selectedCard)
+      .then(updateCardsStorage)
+      .catch((error) => console.error(error));
   });
 
   revealCvvButton.addEventListener("click", () => {
-    executeWithOtp(getCvvCode, cvvMaskedElement, card).catch((error) => console.error(error));
+    executeWithOtp(getCvvCode, cvvMaskedElement, selectedCard)
+      .then(updateCardsStorage)
+      .catch((error) => console.error(error));
   });
 
   updateBalanceButton.addEventListener("click", () => {
@@ -185,17 +187,18 @@ export function addCardSettingsEvents() {
       const isSuccess = await updateActiveBalance(cardId, selectedTokenAddress);
 
       if (isSuccess) {
-        const activeBalance = card.balances.find((b) => b.token_address === selectedTokenAddress);
+        const activeBalance = selectedCard.balances.find((b: Balance) => b.token_address === selectedTokenAddress);
         activeBalanceElement.textContent = activeBalance ? `${activeBalance.balance} ${activeBalance.token_symbol}` : "N/A";
         showToast({ message: "Active balance updated successfully.", type: "success" });
+        await updateCardsStorage();
       } else {
         showToast({ message: "Failed to update active balance.", type: "error" });
       }
     })().catch(console.error);
   });
 
-  cardIdElement.textContent = card.id;
-  userNameElement.textContent = card.card_data.name_on_card;
+  cardIdElement.textContent = selectedCard.id;
+  userNameElement.textContent = selectedCard.card_data.name_on_card;
   if (session?.user.email) {
     userEmailElement.textContent = session.user.email;
   }
@@ -204,13 +207,13 @@ export function addCardSettingsEvents() {
     userPhoneElement.textContent = `${session?.user.phone_number_data.phone_number} (${session?.user.phone_number_data?.is_confirmed ? "Confirmed" : "Not Confirmed"})`;
   }
 
-  cardLimitElement.textContent = `Daily: ${card.limit.daily_limit ? card.limit.daily_limit : 0} / Used: ${card.limit.daily_usage ? card.limit.daily_usage : 0}`;
-  createdAtElement.textContent = card.created_at;
-  updatedAtElement.textContent = card.updated_at ? card.updated_at : "N/A";
-  const activeBalance = card.balances.find((b) => b.is_active);
+  cardLimitElement.textContent = `Daily: ${selectedCard.limit.daily_limit ? selectedCard.limit.daily_limit : 0} / Used: ${selectedCard.limit.daily_usage ? selectedCard.limit.daily_usage : 0}`;
+  createdAtElement.textContent = selectedCard.created_at;
+  updatedAtElement.textContent = selectedCard.updated_at ? selectedCard.updated_at : "N/A";
+  const activeBalance = selectedCard.balances.find((b) => b.is_active);
   activeBalanceElement.textContent = activeBalance ? `${activeBalance.balance} ${activeBalance.token_symbol}` : "N/A";
-  statusText.textContent = card.status;
-  statusButton.textContent = card.status === "Blocked" ? "Unblock" : "Block";
-  cardNumberMaskedElement.textContent = `xxxx xxxx xxxx ${card.card_data.card_number_last_4 ?? "****"}`;
-  cardExpiryElement.textContent = `Expiry: ${card.card_data.expiry_date ?? "xx/xx"}`;
+  statusText.textContent = selectedCard.status;
+  statusButton.textContent = selectedCard.status === "Blocked" ? "Unblock" : "Block";
+  cardNumberMaskedElement.textContent = `xxxx xxxx xxxx ${selectedCard.card_data.card_number_last_4 ?? "****"}`;
+  cardExpiryElement.textContent = `Expiry: ${selectedCard.card_data.expiry_date ?? "xx/xx"}`;
 }

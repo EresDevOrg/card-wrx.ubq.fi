@@ -1,5 +1,5 @@
 import { createWirexApiUrl } from "../../functions/shared";
-import { getSession } from "../shared/user-session";
+import { getSession, getUserCards } from "../shared/user-session";
 import { showToast } from "./toaster";
 
 interface MerchantAmount {
@@ -41,12 +41,12 @@ interface TransactionResponse {
   page_number: number;
   page_size: number;
 }
-
-export function getTransactionsHtml(): string {
-  const session = getSession();
-  if (!session?.cards?.length) {
+export async function getTransactionsHtml(): Promise<string> {
+  const cards = await getUserCards();
+  if (cards?.length === 0) {
     return `<div class="container">Transaction history not found.</div>`;
   }
+
   return `<div class="transactions-container">
             <h2>Transaction History</h2>
             <div class="table-responsive">

@@ -7,7 +7,7 @@ export async function loadTransactionsPage() {
 
   try {
     if (appState.getIsConnectedState()) {
-      const content = getTransactionsHtml();
+      const content = await getTransactionsHtml();
       contentArea.innerHTML = content;
       addTransactionsEvents();
     } else {

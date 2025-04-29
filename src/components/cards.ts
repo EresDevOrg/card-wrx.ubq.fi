@@ -1,11 +1,11 @@
-import { getSession } from "../shared/user-session";
+import { getUserCards } from "../shared/user-session";
 import { showToast } from "./toaster";
 
 export function getCardsHtml(): string {
   return `<div class="card-list"></div>`;
 }
 
-export function addCardsEvents() {
+export async function addCardsEvents() {
   const cardListDiv = document.querySelector(".card-list");
   const genericCardSvg = `
     <svg class="card-image" viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg">
@@ -18,17 +18,13 @@ export function addCardsEvents() {
     </svg>
 `;
 
-  const session = getSession();
-  if (!session) {
-    showToast({ message: "Register to get your card.", type: "error" });
-    return;
-  }
-  if (session && session.cards?.length === 0) {
+  const cards = await getUserCards();
+  if (cards?.length === 0) {
     showToast({ message: "You have no cards.", type: "error" });
     return;
   }
 
-  session.cards?.forEach((card) => {
+  cards?.forEach((card) => {
     const cardContainer = document.createElement("div");
     cardContainer.classList.add("card-container");
 

@@ -1,4 +1,4 @@
-import { Card, User } from "./wirex-types";
+import { User } from "./wirex-types";
 
 export interface GlobalState {
   isLoading: boolean;
@@ -14,5 +14,4 @@ export interface Session {
   expires_at: number;
   wallet: string;
   user: User;
-  cards: Card[] | undefined;
 }
