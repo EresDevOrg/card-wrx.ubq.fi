@@ -33,12 +33,17 @@
   ],
   "dependencies": {
     "@cloudflare/workers-types": "^4.20250409.0",
+    "@privy-io/react-auth": "^2.13.0",
     "@reown/appkit": "^1.7.0",
     "@reown/appkit-adapter-ethers5": "^1.7.0",
     "@sinclair/typebox": "^0.34.33",
     "@ubiquity-dao/rpc-handler": "^1.4.0",
+    "@zerodev/ecdsa-validator": "^5.4.9",
+    "@zerodev/permissions": "^5.5.5",
+    "@zerodev/sdk": "^5.4.34",
     "dotenv": "^16.4.7",
     "ethers": "5.7.2",
+    "viem": "^2.29.0",
     "wrangler": "^4.0.0"
   },
   "devDependencies": {
