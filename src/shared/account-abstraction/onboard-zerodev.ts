@@ -6,6 +6,7 @@ import { contractRegistryAddress, partnerId } from "./constants";
 import { contractRegistryAbi } from "./contract-registry-abi";
 import { createExecutionDelayValidator, getClientWithDelayPolicy, getEip1193Provider, getKernelAccountClient, publicClient } from "./utils";
 import { Signer } from "@zerodev/sdk/types";
+import { showToast } from "../../components/toaster";
 
 export async function setupAccountAbstraction() {
   const signer = getEip1193Provider();
@@ -15,6 +16,10 @@ export async function setupAccountAbstraction() {
   const policyCallData = await getInstallPolicyCallData(client.account.address, signer);
   const calls = await client.account.encodeCalls([executorCallData, policyCallData]);
 
+  showToast({
+    message: "Sign message to create your smart account.",
+    type: "info",
+  });
   // Execute install operations on the account abstraction. This would execute on-chain operation physically deploying AA contract and
   // installing required modules
   const trxHash = await client.sendUserOperation({
@@ -32,6 +37,10 @@ export async function setupAccountAbstraction() {
   const accountCreateCallData = await getAccountCreateCallData();
   const callsAccountCreate = await client.account.encodeCalls([accountCreateCallData]);
 
+  showToast({
+    message: "Sign message to register your smart account with UbiquiCard.",
+    type: "info",
+  });
   // Execute registration operations on the account abstraction.
   const trxHashAccountCreate = await client.sendUserOperation({
     callData: callsAccountCreate,
@@ -42,6 +51,11 @@ export async function setupAccountAbstraction() {
   });
 
   console.log(`Account registered in Wirex Pay Accounts contract successfully. trxHashAccountCreate:${trxHashAccountCreate}`);
+
+  showToast({
+    message: "Your smart account has been registered with UbiquiCard successfully.",
+    type: "success",
+  });
   return client.account.address;
 }
 
