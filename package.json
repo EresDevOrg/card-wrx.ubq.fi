@@ -33,7 +33,6 @@
   ],
   "dependencies": {
     "@cloudflare/workers-types": "^4.20250409.0",
-    "@privy-io/react-auth": "^2.13.0",
     "@reown/appkit": "^1.7.0",
     "@reown/appkit-adapter-ethers5": "^1.7.0",
     "@sinclair/typebox": "^0.34.33",
