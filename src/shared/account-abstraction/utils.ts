@@ -1,17 +1,21 @@
 import { signerToEcdsaValidator } from "@zerodev/ecdsa-validator";
-import { createKernelAccount, createKernelAccountClient, createZeroDevPaymasterClient } from "@zerodev/sdk";
+import { toPermissionValidator } from "@zerodev/permissions";
+import { toSudoPolicy } from "@zerodev/permissions/policies";
+import { toECDSASigner } from "@zerodev/permissions/signers";
+import { createKernelAccount, createKernelAccountClient, createZeroDevPaymasterClient, getUserOperationGasPrice } from "@zerodev/sdk";
 import { getEntryPoint, KERNEL_V3_1 } from "@zerodev/sdk/constants";
 import { Signer } from "@zerodev/sdk/types";
-import { createPublicClient, EIP1193Provider, http } from "viem";
+import { createPublicClient, EIP1193Provider, Hex, http } from "viem";
 import { baseSepolia } from "viem/chains";
-import { PUBLIC_RPC, ZERODEV_RPC } from "./constants";
+import { contractRegistryAddress, PUBLIC_RPC, ZERODEV_RPC } from "./constants";
+import { contractRegistryAbi } from "./contract-registry-abi";
 
 const bundlerTransport = http(ZERODEV_RPC);
-const publicClient = createPublicClient({
+export const publicClient = createPublicClient({
   chain: getCurrentChain(),
   transport: http(PUBLIC_RPC),
 });
-const kernelPublicClient = createPublicClient({
+export const kernelPublicClient = createPublicClient({
   transport: bundlerTransport,
   chain: getCurrentChain(),
 });
@@ -55,6 +59,38 @@ export async function getKernelAccountClient(signer: Signer) {
   return client;
 }
 
+export async function getClientWithDelayPolicy(accountAddress: string) {
+  // Recreate AA client using its initial address and execution delay sudo policy
+  const eip1193Provider = getEip1193Provider();
+  const validator = await createExecutionDelayValidator(eip1193Provider);
+  const account = await createKernelAccount(kernelPublicClient, {
+    entryPoint: getEntryPoint("0.7"),
+    address: accountAddress as Hex,
+    kernelVersion: KERNEL_V3_1,
+    plugins: {
+      sudo: validator,
+    },
+  });
+
+  const client = createKernelAccountClient({
+    account: account,
+    chain: getCurrentChain(),
+    bundlerTransport: bundlerTransport,
+    paymaster: {
+      getPaymasterData(userOperation) {
+        return kernelPaymasterClient.sponsorUserOperation({ userOperation });
+      },
+    },
+    userOperation: {
+      estimateFeesPerGas: async ({ bundlerClient }) => {
+        return getUserOperationGasPrice(bundlerClient);
+      },
+    },
+  });
+
+  return client;
+}
+
 export function getEip1193Provider(): EIP1193Provider {
   if (!window.ethereum) {
     throw new Error("No Ethereum provider found");
@@ -87,4 +123,26 @@ export async function getSmartAccountAddress(): Promise<string | null> {
     console.error("Error checking smart account deployment:", error);
     throw error;
   }
+}
+
+export async function createExecutionDelayValidator(signer: Signer) {
+  const policyAddress = (await publicClient.readContract({
+    address: contractRegistryAddress,
+    abi: contractRegistryAbi, // Can be retrieved using block explorer of your liking
+    functionName: "contractByName",
+    args: ["ExecutionDelayPolicy"],
+  })) as `0x${string}`;
+  const rootPolicy = toSudoPolicy({
+    policyAddress,
+  });
+
+  const res = await toPermissionValidator(kernelPublicClient, {
+    entryPoint: getEntryPoint("0.7"),
+    signer: await toECDSASigner({ signer: signer }),
+    kernelVersion: KERNEL_V3_1,
+    policies: [rootPolicy],
+  });
+
+  res.address = policyAddress;
+  return res;
 }
