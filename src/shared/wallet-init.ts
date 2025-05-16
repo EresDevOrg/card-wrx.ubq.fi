@@ -1,4 +1,6 @@
 /* eslint-disable */
+
+import { ConnectedWallet } from "@privy-io/react-auth";
 import { signerToEcdsaValidator } from "@zerodev/ecdsa-validator";
 import { toPermissionValidator } from "@zerodev/permissions";
 import { toSudoPolicy } from "@zerodev/permissions/policies";
@@ -8,15 +10,13 @@ import { getEntryPoint, KERNEL_V3_1, VALIDATOR_TYPE } from "@zerodev/sdk/constan
 import { concatHex, createPublicClient, createWalletClient, custom, EIP1193Provider, encodeFunctionData, http, pad, zeroAddress, zeroHash } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { baseSepolia } from "viem/chains";
-import { accountsAbi } from "./accounts-abi";
-import { contractRegistryAbi } from "./contract-registery-abi";
+import { contractRegistryAbi } from "./contract-registry-abi";
 
 // RPC clients and RPC addresses
 const PUBLIC_RPC = "https://sepolia.base.org";
-const PAYMASTER_RPC = "https://rpc.zerodev.app/api/v3/90e0d1a0-884c-4bbd-a0d6-1a6740d4af9c/chain/84532?selfFunded=true";
-const BUNDLER_RPC = "https://rpc.zerodev.app/api/v3/90e0d1a0-884c-4bbd-a0d6-1a6740d4af9c/chain/84532?selfFunded=true";
+const ZERODEV_RPC = "https://rpc.zerodev.app/api/v3/90e0d1a0-884c-4bbd-a0d6-1a6740d4af9c/chain/84532";
 
-const bundlerTransport = http(BUNDLER_RPC);
+const bundlerTransport = http(ZERODEV_RPC);
 const publicClient: any = createPublicClient({
   chain: baseSepolia,
   transport: http(PUBLIC_RPC),
@@ -27,7 +27,7 @@ const kernelPublicClient: any = createPublicClient({
 });
 const kernelPaymasterClient: any = createZeroDevPaymasterClient({
   chain: baseSepolia,
-  transport: http(PAYMASTER_RPC),
+  transport: http(ZERODEV_RPC),
 });
 
 // As of now this is the current ContractRegistry address for Base Sepolia chain
@@ -35,18 +35,15 @@ const ContractRegistryAddress = "0x062AfB76614dd594A99e70fD2CfbDf417CCF8797";
 
 // This is a unique identifier of your partner integration. It would be provided to you by Wirex Pay team
 const PartnerId = "0x00000000000000000000000000000014";
+
 // Privy flow, ConnectedWallet object is either an embedded wallet or an external waller linked during onboarding
-export async function createAccountAbstraction_Privy(wasCreated: boolean) {
-  let nativeProvider = window.ethereum;
+export async function createAccountAbstraction_Privy(mainWallet: ConnectedWallet, wasCreated: boolean) {
+  let nativeProvider = await mainWallet.getEthereumProvider();
   return await createAccountAbstraction_EIP1193Provider(nativeProvider as EIP1193Provider, wasCreated);
 }
 
 // EIP1193 flow. Provider should be a EIP1193 compatible object implementing all required functions.
 export function createAccountAbstraction_EIP1193Provider(provider: EIP1193Provider, wasCreated: boolean) {
-  if (!provider) {
-    alert("No provider found");
-    return;
-  }
   const signer = createWalletClient({
     chain: baseSepolia,
     transport: custom(provider),
@@ -70,7 +67,6 @@ export async function createAccountAbstraction_Base(signer: any, wasCreated: boo
       sudo: simpleValidator,
     },
   });
-  console.log("Your Kernel Account Address:", account.address);
   let client = createKernelAccountClient({
     account: account,
     chain: baseSepolia,
@@ -83,7 +79,6 @@ export async function createAccountAbstraction_Base(signer: any, wasCreated: boo
   });
 
   // If this is a first creation than the AA has to be properly deployed on chain and required modules must be configured before Wirex Pay system can work with it.
-  console.log("wasCreated", wasCreated);
   if (!wasCreated) {
     // Prepare call data for calls to install execution delay policy and funds management executor
     let executorCallData = await getInstallExecutorCallData(client.account.address);
@@ -103,7 +98,6 @@ export async function createAccountAbstraction_Base(signer: any, wasCreated: boo
 
   // Recreate AA client using its initial address and execution delay sudo policy
   let accountAddress = client.account.address;
-
   let validator = await createExecutionDelayValidator(signer);
   account = await createKernelAccount(kernelPublicClient, {
     entryPoint: getEntryPoint("0.7"),
@@ -124,10 +118,8 @@ export async function createAccountAbstraction_Base(signer: any, wasCreated: boo
       },
     },
   });
-  console.log("Your Kernel Account Address:", client.account.address);
 
   // If this is initial deployment than newly deployed AA must be registered in Wirex Pay Accounts contract.
-  console.log("wasCreated2", wasCreated);
   if (!wasCreated) {
     // Create call data for registering in Wirex Pay Accounts contract
     let accountCreateCallData = await getAccountCreateCallData();
