@@ -10,7 +10,7 @@ import { showToast } from "../../components/toaster";
 
 export async function setupAccountAbstraction() {
   const signer = getEip1193Provider();
-  let client = await getKernelAccountClient(signer);
+  const client = await getKernelAccountClient(signer);
   // Prepare call data for calls to install execution delay policy and funds management executor
   const executorCallData = await getInstallExecutorCallData(client.account.address);
   const policyCallData = await getInstallPolicyCallData(client.account.address, signer);
@@ -29,9 +29,13 @@ export async function setupAccountAbstraction() {
     hash: trxHash,
     timeout: 30 * 1000,
   });
-  console.log("Account abstraction deployed successfully. Attaching to wirex now.");
+  console.log("Account abstraction deployed successfully.");
 
-  client = await getClientWithDelayPolicy(client.account.address);
+  return client.account.address;
+}
+
+export async function registerWithWirexOnChain(smartAccount: string) {
+  const client = await getClientWithDelayPolicy(smartAccount);
 
   // Create call data for registering in Wirex Pay Accounts contract
   const accountCreateCallData = await getAccountCreateCallData();
@@ -46,7 +50,7 @@ export async function setupAccountAbstraction() {
     callData: callsAccountCreate,
   });
   await client.waitForUserOperationReceipt({
-    hash: trxHash,
+    hash: trxHashAccountCreate,
     timeout: 30 * 1000,
   });
 
@@ -56,7 +60,6 @@ export async function setupAccountAbstraction() {
     message: "Your smart account has been registered with UbiquiCard successfully.",
     type: "success",
   });
-  return client.account.address;
 }
 
 async function getInstallExecutorCallData(targetWalletAddress: `0x${string}`) {
@@ -119,4 +122,23 @@ export async function getAccountCreateCallData() {
     value: BigInt(0),
     data: data,
   };
+}
+
+export async function isRegisteredWithWirex(smartAccount: string, eoaAddress: string): Promise<boolean> {
+  const accountsContract = (await publicClient.readContract({
+    address: contractRegistryAddress,
+    abi: contractRegistryAbi, // Can be retrieved using block explorer of your liking
+    functionName: "contractByName",
+    args: ["Accounts"],
+  })) as `0x${string}`;
+
+  const ownerOnChain = (await publicClient.readContract({
+    address: accountsContract,
+    abi: accountsAbi, // Can be retrieved using block explorer of your liking
+    functionName: "getWallet",
+    args: [partnerId, smartAccount],
+  })) as { confirmationStatus: number; owner: string };
+  console.log("ownerOnChain", ownerOnChain);
+
+  return ownerOnChain.owner.toLowerCase() == eoaAddress.toLowerCase();
 }
