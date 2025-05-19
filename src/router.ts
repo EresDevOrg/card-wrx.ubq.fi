@@ -1,7 +1,10 @@
-import { loadPage1 } from "./controllers/page1";
-import { loadPage2 } from "./controllers/page2";
 import { redirectTo404 } from "./controllers/404";
+import { loadCardSettingsPage } from "./controllers/card-settings";
+import { loadCardsPage } from "./controllers/cards";
 import { loadHomePage } from "./controllers/home";
+import { loadMintPage } from "./controllers/mint-card";
+import { loadRegisterPage } from "./controllers/register";
+import { loadTransactionsPage } from "./controllers/transaction-history";
 
 // URL Path based routing
 export async function handleRouting() {
@@ -12,30 +15,30 @@ export async function handleRouting() {
   // Normalize route to handle default case
   const route = window.location.hash || "#/home";
 
-  switch (route) {
-    case "#/home":
-    case "#/index":
+  switch (
+    true // Switch on 'true' to allow for more complex conditions
+  ) {
+    case route === "#/home" || route === "#/index":
       await loadHomePage();
       break;
-    case "#/page1":
-      await loadPage1();
+    case route === "#/register":
+      await loadRegisterPage();
       break;
-    case "#/page2":
-      await loadPage2();
+    case route === "#/mint":
+      await loadMintPage();
+      break;
+    case route === "#/cards":
+      await loadCardsPage(); // Optionally load a general cards overview page
+      break;
+    case route.startsWith("#/cards/"):
+      await loadCardSettingsPage(); // Call a new function to load the specific card's details
+      break;
+    case route === "#/transactions":
+      await loadTransactionsPage(); // Optionally load a general cards overview page
       break;
     default:
       // Redirect to 404 page if no route matches
       await redirectTo404();
       break;
-  }
-}
-
-export function setupRouter() {
-  if (typeof window !== "undefined") {
-    window.addEventListener("hashchange", () => {
-      handleRouting().catch(console.error);
-    });
-
-    handleRouting().catch(console.error);
   }
 }
