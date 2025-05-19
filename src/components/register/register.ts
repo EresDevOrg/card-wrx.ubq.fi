@@ -7,7 +7,7 @@ import { getSupportedCountriesHtml } from "./countries-dropdown";
 import { getKycLink, isKycApproved } from "./kyc";
 import { registerOnApp } from "./on-app-register";
 import { registerOnChain } from "./on-chain-register";
-import { registerPhone } from "./phone-register";
+import { confirmPhoneRegister, registerPhone } from "./phone-register";
 
 let smsOtpResponse: SmsOtpResponse | null = null;
 
@@ -174,6 +174,7 @@ export function addRegisterEvents() {
           const verifyOtpResponse = await verifyOtp(verificationCode, session, smsOtpResponse).catch(console.error);
 
           if (verifyOtpResponse) {
+            await confirmPhoneRegister(verifyOtpResponse);
             showToast({ message: "Your phone number has been verified. Your registration is complete.", type: "success" });
             const step4 = document.getElementById("step-4");
             if (step4) step4.style.display = "none";

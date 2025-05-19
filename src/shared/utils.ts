@@ -1,7 +1,7 @@
 import { createWirexApiUrl } from "../../functions/shared";
 import { showToast } from "../components/toaster";
 import { backendBaseUrl } from "../constants";
-import { userSigner } from "../main";
+import { appState, userSigner } from "../main";
 import { Session } from "./types";
 import { SmsOtpResponse, VerifyOtpResponse } from "./wirex-types";
 
@@ -31,6 +31,7 @@ export async function sendOtpForAction(session: Session, action: "GetCardDetails
       Accept: "application/json",
       Authorization: `Bearer ${session.access_token}`,
       "X-User-Wallet": session.wallet,
+      "X-Chain-Id": getConnectedChainId(),
     },
     body: JSON.stringify({
       action_type: action,
@@ -58,6 +59,7 @@ export async function verifyOtp(otp: string, session: Session, smsResponse: SmsO
       Accept: "application/json",
       Authorization: `Bearer ${session.access_token}`,
       "X-User-Wallet": session.wallet,
+      "X-Chain-Id": getConnectedChainId(),
     },
     body: JSON.stringify({
       code: otp,
@@ -88,4 +90,13 @@ export async function getEnv() {
     return null;
   }
   return responseJson;
+}
+
+export function getConnectedChainId(): string {
+  const chainId = appState.getChainId();
+  if (chainId) {
+    return chainId.toString();
+  }
+
+  throw new Error("Couldn't detect current chain id.");
 }
